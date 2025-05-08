@@ -1,6 +1,22 @@
 import { showApiError } from '@/src/api/error'
 import { axiosInstance } from '@/src/api/interceptors'
 
+export interface DocsDocument {
+	id: string
+	category_id: string
+	document: string
+	document_description: string
+	document_name: string
+	document_year: string
+	visible: boolean
+	teacher_id: {
+		id: string
+		position_id: number
+		logo_teacher: string | null
+		full_name: string
+	}
+}
+
 export const DocumentsService = {
 	async getAll(params?: {
 		categoryId?: number
@@ -19,7 +35,7 @@ export const DocumentsService = {
 		}
 	},
 
-	async getById(id: number) {
+	async getById(id: number|string) {
 		try {
 			const { data } = await axiosInstance.get(
 				`/api/v1/documents/document/${id}/`
@@ -33,6 +49,12 @@ export const DocumentsService = {
 
 	async create(documentData: FormData) {
 		try {
+			// Log the form data for debugging
+			console.log('Creating document with data:')
+			for (const [key, value] of documentData.entries()) {
+				console.log(`${key}: ${value instanceof File ? value.name : value}`)
+			}
+
 			const { data } = await axiosInstance.post(
 				'/api/v1/documents/document/',
 				documentData,
@@ -49,8 +71,14 @@ export const DocumentsService = {
 		}
 	},
 
-	async update(id: number, documentData: FormData) {
+	async update(id: number|string, documentData: FormData) {
 		try {
+			// Log the form data for debugging
+			console.log('Updating document with data:')
+			for (const [key, value] of documentData.entries()) {
+				console.log(`${key}: ${value instanceof File ? value.name : value}`)
+			}
+
 			const { data } = await axiosInstance.put(
 				`/api/v1/documents/document/${id}/`,
 				documentData,

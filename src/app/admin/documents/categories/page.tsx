@@ -51,10 +51,9 @@ export default function CategoriesPage() {
 		handleSubmit,
 		reset,
 		formState: { errors },
-	} = useForm<{ name: string; description: string }>({
+	} = useForm<{ category_name: string }>({
 		defaultValues: {
-			name: '',
-			description: '',
+			category_name: '',
 		},
 	})
 
@@ -67,7 +66,7 @@ export default function CategoriesPage() {
 		setError(null)
 		try {
 			const response = await DocumentCategoryService.getAll()
-			setCategories(response.results || [])
+			setCategories(response || [])
 		} catch (err) {
 			setError('Не удалось загрузить категории')
 			console.error('Error fetching categories:', err)
@@ -79,16 +78,10 @@ export default function CategoriesPage() {
 	const handleOpenDialog = (category?: DocumentCategory) => {
 		if (category) {
 			setEditingCategory(category)
-			reset({
-				name: category.name,
-				description: category.description || '',
-			})
+			reset({ category_name: category.category_name })
 		} else {
 			setEditingCategory(null)
-			reset({
-				name: '',
-				description: '',
-			})
+			reset({ category_name: '' })
 		}
 		setDialogOpen(true)
 	}
@@ -97,13 +90,12 @@ export default function CategoriesPage() {
 		setDialogOpen(false)
 	}
 
-	const onSubmit = async (data: { name: string; description: string }) => {
+	const onSubmit = async (data: { category_name: string }) => {
 		setIsSubmitting(true)
 		setError(null)
 
 		try {
 			if (editingCategory) {
-				// Update existing category
 				const updatedCategory = await DocumentCategoryService.update(
 					editingCategory.id,
 					data
@@ -114,7 +106,6 @@ export default function CategoriesPage() {
 					)
 				)
 			} else {
-				// Create new category
 				const newCategory = await DocumentCategoryService.create(data)
 				setCategories([...categories, newCategory])
 			}
@@ -134,7 +125,6 @@ export default function CategoriesPage() {
 
 	const handleDeleteConfirm = async () => {
 		if (!categoryToDelete) return
-
 		setIsDeleting(true)
 		try {
 			await DocumentCategoryService.delete(categoryToDelete.id)
@@ -196,42 +186,42 @@ export default function CategoriesPage() {
 				<Table>
 					<TableHead>
 						<TableRow>
-							<TableCell>Название</TableCell>
-							<TableCell>Описание</TableCell>
+							<TableCell sx={{ width: '100%' }}>Название</TableCell>
 							<TableCell align='right'>Действия</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
 						{isLoading ? (
 							<TableRow>
-								<TableCell colSpan={3} align='center' sx={{ py: 3 }}>
+								<TableCell colSpan={2} align='center' sx={{ py: 3 }}>
 									<CircularProgress />
 								</TableCell>
 							</TableRow>
 						) : categories.length > 0 ? (
 							categories.map(category => (
 								<TableRow key={category.id}>
-									<TableCell>{category.name}</TableCell>
-									<TableCell>{category.description || '—'}</TableCell>
+									<TableCell>{category.category_name}</TableCell>
 									<TableCell align='right'>
-										<IconButton
-											color='primary'
-											onClick={() => handleOpenDialog(category)}
-										>
-											<EditIcon />
-										</IconButton>
-										<IconButton
-											color='error'
-											onClick={() => handleDeleteClick(category)}
-										>
-											<DeleteIcon />
-										</IconButton>
+										<Box display='flex' gap={1} justifyContent='flex-end'>
+											<IconButton
+												color='primary'
+												onClick={() => handleOpenDialog(category)}
+											>
+												<EditIcon />
+											</IconButton>
+											<IconButton
+												color='error'
+												onClick={() => handleDeleteClick(category)}
+											>
+												<DeleteIcon />
+											</IconButton>
+										</Box>
 									</TableCell>
 								</TableRow>
 							))
 						) : (
 							<TableRow>
-								<TableCell colSpan={3} align='center'>
+								<TableCell colSpan={2} align='center'>
 									Категории не найдены
 								</TableCell>
 							</TableRow>
@@ -240,7 +230,7 @@ export default function CategoriesPage() {
 				</Table>
 			</TableContainer>
 
-			{/* Category Form Dialog */}
+			{/* Dialog для добавления/редактирования категории */}
 			<Dialog
 				open={dialogOpen}
 				onClose={handleCloseDialog}
@@ -253,7 +243,7 @@ export default function CategoriesPage() {
 				<DialogContent>
 					<Box component='form' noValidate sx={{ mt: 1 }}>
 						<Controller
-							name='name'
+							name='category_name'
 							control={control}
 							rules={{ required: 'Название обязательно' }}
 							render={({ field }) => (
@@ -263,23 +253,8 @@ export default function CategoriesPage() {
 									required
 									fullWidth
 									label='Название категории'
-									error={!!errors.name}
-									helperText={errors.name?.message}
-								/>
-							)}
-						/>
-
-						<Controller
-							name='description'
-							control={control}
-							render={({ field }) => (
-								<TextField
-									{...field}
-									margin='normal'
-									fullWidth
-									label='Описание'
-									multiline
-									rows={3}
+									error={!!errors.category_name}
+									helperText={errors.category_name?.message}
 								/>
 							)}
 						/>
@@ -299,13 +274,13 @@ export default function CategoriesPage() {
 				</DialogActions>
 			</Dialog>
 
-			{/* Delete Confirmation Dialog */}
+			{/* Подтверждение удаления */}
 			<Dialog open={deleteDialogOpen} onClose={handleDeleteCancel}>
 				<DialogTitle>Подтверждение удаления</DialogTitle>
 				<DialogContent>
 					<Typography>
-						Вы уверены, что хотите удалить категорию "{categoryToDelete?.name}"?
-						Это действие нельзя отменить.
+						Вы уверены, что хотите удалить категорию "
+						{categoryToDelete?.category_name}"? Это действие нельзя отменить.
 					</Typography>
 				</DialogContent>
 				<DialogActions>

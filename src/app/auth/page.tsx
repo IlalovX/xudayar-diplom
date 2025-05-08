@@ -1,19 +1,19 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { AuthService } from '@/src/service/auth.service'
 import {
+	Alert,
 	Box,
-	Container,
-	Paper,
-	Typography,
-	TextField,
 	Button,
 	CircularProgress,
-	Alert,
+	Container,
+	Paper,
+	TextField,
+	Typography,
 } from '@mui/material'
-import { useForm, Controller } from 'react-hook-form'
-import { AuthService } from '@/src/service/auth.service'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
 
 interface LoginForm {
 	username: string

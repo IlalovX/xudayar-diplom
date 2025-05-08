@@ -28,12 +28,8 @@ export const AuthService = {
 
 			if (response.data.access && response.data.refresh) {
 				AuthTokenService.saveTokens(response.data.access, response.data.refresh)
-				AuthTokenService.saveUser({
-					id: 0,
-					username: 'Xudayuar',
-					role: 'teacher',
-					fullName: 'FIO',
-				})
+				const res = await axiosInstance.get('/api/v1/teachers/detail/teacher/')
+				AuthTokenService.saveUser(res.data)
 			}
 
 			return response.data
@@ -62,7 +58,9 @@ export const AuthService = {
 
 	async getCurrentUser() {
 		try {
-			const response = await axiosInstance.get('/api/v1/users/me/')
+			const response = await axiosInstance.get(
+				'/api/v1/teachers/detail/teacher/'
+			)
 			AuthTokenService.saveUser(response.data)
 			return response.data
 		} catch (error) {

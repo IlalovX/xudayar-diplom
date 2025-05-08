@@ -20,72 +20,64 @@ const Footer = ({ lang }: FooterProps) => {
 		<Box component='footer' sx={{ bgcolor: '#0D47A1', color: 'white', py: 6 }}>
 			<Container maxWidth='lg'>
 				<Grid container spacing={4}>
-					<Grid item xs={12} md={4}>
+					<Grid size={4}>
 						<Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-							<Image
-								src='/logo.png'
-								alt='Министерство Высшего Образования'
-								width={40}
-								height={40}
-							/>
+							<Image src='/logo.svg' alt='ДИ кафедра' width={40} height={40} />
 							<Typography variant='h6' sx={{ ml: 1, fontWeight: 700 }}>
-								Министерство Высшего Образования
+								ДИ кафедра
 							</Typography>
 						</Box>
 						<Typography variant='body2' sx={{ mb: 2 }}>
-							Официальный сайт Министерства Высшего Образования Республики
-							Узбекистан
+							Официальный сайт ДИ кафедра
 						</Typography>
-						<Typography variant='body2'>
-							Адрес: г. Ташкент, ул. Университетская, 7
-						</Typography>
+						<Typography variant='body2'>Адрес: г. Нукус</Typography>
 						<Typography variant='body2'>Телефон: +998 71 123-45-67</Typography>
-						<Typography variant='body2'>Email: info@edu.uz</Typography>
+						<Typography variant='body2'>Email: nukusstu@edu.uz</Typography>
 					</Grid>
 
-					<Grid item xs={12} md={4}>
+					<Grid size={4}>
 						<Typography variant='h6' sx={{ mb: 2, fontWeight: 700 }}>
 							Полезные ссылки
 						</Typography>
-						<Link href={`/${lang}/documents`} passHref>
-							<MuiLink
-								color='inherit'
-								underline='hover'
-								sx={{ display: 'block', mb: 1 }}
-							>
-								Документы
-							</MuiLink>
-						</Link>
-						<Link href={`/${lang}/news`} passHref>
-							<MuiLink
-								color='inherit'
-								underline='hover'
-								sx={{ display: 'block', mb: 1 }}
-							>
-								Новости
-							</MuiLink>
-						</Link>
-						<Link href={`/${lang}/teachers`} passHref>
-							<MuiLink
-								color='inherit'
-								underline='hover'
-								sx={{ display: 'block', mb: 1 }}
-							>
-								Преподаватели
-							</MuiLink>
-						</Link>
-						<Link href={`/${lang}/about`} passHref>
-							<MuiLink
-								color='inherit'
-								underline='hover'
-								sx={{ display: 'block', mb: 1 }}
-							>
-								О нас
-							</MuiLink>
-						</Link>
+						<MuiLink
+							component={Link}
+							href={`/${lang}/documents`}
+							color='inherit'
+							underline='hover'
+							sx={{ display: 'block', mb: 1 }}
+						>
+							Документы
+						</MuiLink>
+						<MuiLink
+							component={Link}
+							href={`/${lang}/news`}
+							color='inherit'
+							underline='hover'
+							sx={{ display: 'block', mb: 1 }}
+						>
+							Новости
+						</MuiLink>
+						<MuiLink
+							component={Link}
+							href={`/${lang}/teachers`}
+							color='inherit'
+							underline='hover'
+							sx={{ display: 'block', mb: 1 }}
+						>
+							Преподаватели
+						</MuiLink>
+						<MuiLink
+							component={Link}
+							href={`/${lang}/about`}
+							color='inherit'
+							underline='hover'
+							sx={{ display: 'block', mb: 1 }}
+						>
+							О нас
+						</MuiLink>
 					</Grid>
 
-					<Grid item xs={12} md={4}>
+					<Grid size={4}>
 						<Typography variant='h6' sx={{ mb: 2, fontWeight: 700 }}>
 							Государственные ресурсы
 						</Typography>

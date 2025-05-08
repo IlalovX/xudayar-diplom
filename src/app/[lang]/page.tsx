@@ -1,153 +1,136 @@
+'use client'
+import { NewsService } from '@/src/service/news.service'
+import {
+	BarChart,
+	Contacts,
+	EmojiEvents,
+	HowToReg,
+	Lightbulb,
+	MenuBook,
+	Psychology,
+	School,
+	Science,
+	Work,
+} from '@mui/icons-material'
 import {
 	Box,
 	Button,
 	Card,
 	CardContent,
 	CardMedia,
+	CircularProgress,
 	Container,
 	Grid,
 	Typography,
 } from '@mui/material'
 import Image from 'next/image'
 import Link from 'next/link'
+import { use, useEffect, useState } from 'react'
 
 interface HomePageProps {
-	params: {
+	params: Promise<{
 		lang: string
-	}
+	}>
 }
 
-export default function HomePage({ params }: HomePageProps) {
+export default function HomePage({ params: paramsPromise }: HomePageProps) {
+	const params = use(paramsPromise)
 	const { lang } = params
 
-	// Mock data for news
-	const newsItems = [
-		{
-			id: 1,
-			title: 'Встреча с представителями международных университетов',
-			content:
-				'Министр высшего образования провел встречу с представителями ведущих международных университетов для обсуждения сотрудничества.',
-			date: '2023-05-15',
-			image: '/news-1.jpg',
-			slug: 'meeting-with-international-universities',
-		},
-		{
-			id: 2,
-			title: 'Новые стандарты высшего образования утверждены',
-			content:
-				'Правительство утвердило новые образовательные стандарты, которые вступят в силу с нового учебного года.',
-			date: '2023-05-10',
-			image: '/news-2.png',
-			slug: 'new-education-standards',
-		},
-		{
-			id: 3,
-			title: 'Открытие нового учебного корпуса',
-			content:
-				'В Ташкентском государственном университете состоялось торжественное открытие нового учебного корпуса.',
-			date: '2023-05-05',
-			image: '/news-3.png',
-			slug: 'new-campus-building-opening',
-		},
-		{
-			id: 4,
-			title: 'Международная конференция по инновациям в образовании',
-			content:
-				'В Самарканде прошла международная конференция, посвященная инновационным методам в высшем образовании.',
-			date: '2023-04-28',
-			image: '/news-4.png',
-			slug: 'international-conference-on-education-innovations',
-		},
-		{
-			id: 5,
-			title: 'Подписание меморандума с Кембриджским университетом',
-			content:
-				'Министерство высшего образования подписало меморандум о сотрудничестве с Кембриджским университетом.',
-			date: '2023-04-20',
-			image: '/news-5.png',
-			slug: 'cambridge-university-memorandum',
-		},
-	]
+	const [newsItems, setNewsItems] = useState<any[]>([])
+	const [isLoading, setIsLoading] = useState(true)
+	const [error, setError] = useState<string | null>(null)
 
-	// Mock data for services
+	useEffect(() => {
+		const fetchNews = async () => {
+			try {
+				setIsLoading(true)
+				const news = await NewsService.getAll()
+				setNewsItems(news)
+				setError(null)
+			} catch (err) {
+				console.error('Failed to fetch news:', err)
+				setError('Failed to load news. Please try again later.')
+			} finally {
+				setIsLoading(false)
+			}
+		}
+
+		fetchNews()
+	}, [])
+
 	const services = [
 		{
 			id: 1,
 			title: 'Образование',
-			icon: '/icons/education.png',
+			icon: <School sx={{ color: 'white' }} />,
 			link: `/${lang}/education`,
 		},
 		{
 			id: 2,
 			title: 'Наука',
-			icon: '/icons/science.png',
+			icon: <Science sx={{ color: 'white' }} />,
 			link: `/${lang}/science`,
 		},
 		{
 			id: 3,
 			title: 'Инновации',
-			icon: '/icons/innovation.png',
+			icon: <Lightbulb sx={{ color: 'white' }} />,
 			link: `/${lang}/innovation`,
-		},
-		{
-			id: 4,
-			title: 'Международное сотрудничество',
-			icon: '/icons/international.png',
-			link: `/${lang}/international`,
-		},
-		{
-			id: 5,
-			title: 'Документы',
-			icon: '/icons/documents.png',
-			link: `/${lang}/documents`,
 		},
 		{
 			id: 6,
 			title: 'Контакты',
-			icon: '/icons/contacts.png',
+			icon: <Contacts sx={{ color: 'white' }} />,
 			link: `/${lang}/contacts`,
 		},
 	]
 
-	// Mock data for quick links
 	const quickLinks = [
 		{
 			id: 1,
 			title: 'Поступление в ВУЗы',
-			icon: '/icons/admission.png',
+			icon: <HowToReg sx={{ color: 'black', width: '40px', height: '40px' }} />,
 			link: `/${lang}/admission`,
 		},
 		{
 			id: 2,
 			title: 'Стипендии и гранты',
-			icon: '/icons/scholarship.png',
+			icon: <EmojiEvents sx={{ color: 'black', width: '40px', height: '40px' }} />,
 			link: `/${lang}/scholarships`,
 		},
 		{
 			id: 3,
 			title: 'Научные проекты',
-			icon: '/icons/research.png',
+			icon: <Psychology sx={{ color: 'black', width: '40px', height: '40px' }} />,
 			link: `/${lang}/research`,
 		},
 		{
 			id: 4,
 			title: 'Рейтинг ВУЗов',
-			icon: '/icons/ranking.png',
+			icon: <BarChart sx={{ color: 'black', width: '40px', height: '40px' }} />,
 			link: `/${lang}/rankings`,
 		},
 		{
 			id: 5,
 			title: 'Электронная библиотека',
-			icon: '/icons/library.png',
+			icon: <MenuBook sx={{ color: 'black', width: '40px', height: '40px' }} />,
 			link: `/${lang}/library`,
 		},
 		{
 			id: 6,
 			title: 'Вакансии',
-			icon: '/icons/jobs.png',
+			icon: <Work sx={{ color: 'black', width: '40px', height: '40px' }} />,
 			link: `/${lang}/jobs`,
 		},
 	]
+
+	const getImageUrl = (news: any) =>
+		news.image?.startsWith('http')
+			? news.image
+			: news.image || '/placeholder.svg'
+
+	const getNewsSlug = (news: any) => news.slug || `${news.id}`
 
 	return (
 		<>
@@ -161,8 +144,8 @@ export default function HomePage({ params }: HomePageProps) {
 				}}
 			>
 				<Image
-					src='/hero-image.jpg'
-					alt='Министерство Высшего Образования'
+					src='/center.jfif'
+					alt='ДИ кафедры'
 					fill
 					style={{ objectFit: 'cover' }}
 					priority
@@ -189,10 +172,7 @@ export default function HomePage({ params }: HomePageProps) {
 						component='h1'
 						sx={{ fontWeight: 700, mb: 2 }}
 					>
-						Министерство Высшего Образования
-					</Typography>
-					<Typography variant='h5' sx={{ mb: 4, maxWidth: '800px' }}>
-						Республика Узбекистан
+						ДИ кафедры
 					</Typography>
 					<Button
 						variant='contained'
@@ -211,7 +191,7 @@ export default function HomePage({ params }: HomePageProps) {
 				<Container>
 					<Grid container spacing={2} justifyContent='center'>
 						{services.map(service => (
-							<Grid item xs={6} sm={4} md={2} key={service.id}>
+							<Grid size={3} key={service.id}>
 								<Link
 									href={service.link}
 									passHref
@@ -241,12 +221,7 @@ export default function HomePage({ params }: HomePageProps) {
 												mb: 1,
 											}}
 										>
-											<Image
-												src={service.icon || '/placeholder.svg'}
-												alt={service.title}
-												width={30}
-												height={30}
-											/>
+											{service.icon}
 										</Box>
 										<Typography
 											variant='subtitle2'
@@ -286,167 +261,111 @@ export default function HomePage({ params }: HomePageProps) {
 						</Button>
 					</Box>
 
-					<Grid container spacing={3}>
-						{/* Featured news */}
-						<Grid item xs={12} md={6}>
-							<Card
-								sx={{
-									height: '100%',
-									display: 'flex',
-									flexDirection: 'column',
-								}}
+					{isLoading ? (
+						<Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+							<CircularProgress />
+						</Box>
+					) : error ? (
+						<Box sx={{ textAlign: 'center', py: 4 }}>
+							<Typography color='error'>{error}</Typography>
+							<Button
+								variant='contained'
+								sx={{ mt: 2 }}
+								onClick={() => window.location.reload()}
 							>
-								<CardMedia
-									component='img'
-									height='300'
-									image='/featured-news.jpg'
-									alt={newsItems[0].title}
-								/>
-								<CardContent sx={{ flexGrow: 1 }}>
-									<Typography gutterBottom variant='h5' component='h3'>
-										{newsItems[0].title}
-									</Typography>
-									<Typography
-										variant='body2'
-										color='text.secondary'
-										sx={{ mb: 2 }}
-									>
-										{newsItems[0].content}
-									</Typography>
-									<Button
-										variant='contained'
-										component={Link}
-										href={`/${lang}/news/${newsItems[0].slug}`}
-									>
-										Читать далее
-									</Button>
-								</CardContent>
-							</Card>
-						</Grid>
-
-						{/* Other news */}
-						<Grid item xs={12} md={6}>
-							<Grid container spacing={2}>
-								{newsItems.slice(1, 5).map(news => (
-									<Grid item xs={12} key={news.id}>
-										<Card sx={{ display: 'flex', height: '100%' }}>
-											<CardMedia
-												component='img'
-												sx={{ width: 120 }}
-												image={news.image}
-												alt={news.title}
-											/>
-											<CardContent sx={{ flex: '1 0 auto' }}>
-												<Typography variant='subtitle1' component='h3'>
-													{news.title}
-												</Typography>
-												<Typography
-													variant='body2'
-													color='text.secondary'
-													noWrap
-												>
-													{news.content}
-												</Typography>
-												<Button
-													size='small'
-													component={Link}
-													href={`/${lang}/news/${news.slug}`}
-													sx={{ mt: 1 }}
-												>
-													Подробнее
-												</Button>
-											</CardContent>
-										</Card>
-									</Grid>
-								))}
+								Попробовать снова
+							</Button>
+						</Box>
+					) : newsItems.length === 0 ? (
+						<Box sx={{ textAlign: 'center', py: 4 }}>
+							<Typography>Новости не найдены</Typography>
+						</Box>
+					) : (
+						<Grid container spacing={3}>
+							<Grid size={12}>
+								<Card
+									sx={{
+										height: '100%',
+										display: 'flex',
+										flexDirection: 'column',
+									}}
+								>
+									<CardMedia
+										component='img'
+										height='300'
+										image={getImageUrl(newsItems[0])}
+										alt={newsItems[0].title}
+									/>
+									<CardContent sx={{ flexGrow: 1 }}>
+										<Typography gutterBottom variant='h5'>
+											{newsItems[0].title}
+										</Typography>
+										<Typography
+											variant='body2'
+											color='text.secondary'
+											sx={{ mb: 2 }}
+										>
+											{newsItems[0].content ||
+												newsItems[0].description ||
+												newsItems[0].short_description}
+										</Typography>
+										<Button
+											variant='contained'
+											component={Link}
+											href={`/${lang}/news/${getNewsSlug(newsItems[0])}`}
+										>
+											Читать далее
+										</Button>
+									</CardContent>
+								</Card>
+							</Grid>
+							<Grid size={12}>
+								<Grid container spacing={2}>
+									{newsItems.slice(1, 5).map(news => (
+										<Grid size={12} key={news.id}>
+											<Card sx={{ display: 'flex' }}>
+												<CardMedia
+													component='img'
+													sx={{ width: 160 }}
+													image={getImageUrl(news)}
+													alt={news.title}
+												/>
+												<CardContent>
+													<Typography variant='subtitle1' gutterBottom>
+														{news.title}
+													</Typography>
+													<Button
+														variant='text'
+														component={Link}
+														href={`/${lang}/news/${getNewsSlug(news)}`}
+														sx={{ mt: 1 }}
+													>
+														Подробнее
+													</Button>
+												</CardContent>
+											</Card>
+										</Grid>
+									))}
+								</Grid>
 							</Grid>
 						</Grid>
-					</Grid>
-				</Container>
-			</Box>
-
-			{/* Minister Section */}
-			<Box sx={{ py: 6, backgroundColor: '#f5f5f5' }}>
-				<Container>
-					<Grid container spacing={4} alignItems='center'>
-						<Grid item xs={12} md={4}>
-							<Box
-								sx={{
-									borderRadius: 2,
-									overflow: 'hidden',
-									boxShadow: 3,
-									position: 'relative',
-									height: 400,
-								}}
-							>
-								<Image
-									src='/minister.jpg'
-									alt='Министр высшего образования'
-									fill
-									style={{ objectFit: 'cover' }}
-								/>
-							</Box>
-						</Grid>
-						<Grid item xs={12} md={8}>
-							<Typography
-								variant='h4'
-								component='h2'
-								sx={{ fontWeight: 700, color: 'primary.main', mb: 2 }}
-							>
-								Обращение Министра
-							</Typography>
-							<Typography variant='body1' paragraph>
-								Уважаемые посетители официального сайта Министерства высшего
-								образования Республики Узбекистан!
-							</Typography>
-							<Typography variant='body1' paragraph>
-								Наша главная цель – обеспечение качественного и доступного
-								высшего образования для всех граждан Узбекистана, развитие
-								научного потенциала страны и интеграция в международное
-								образовательное пространство.
-							</Typography>
-							<Typography variant='body1' paragraph>
-								Мы стремимся создать современную систему высшего образования,
-								которая будет соответствовать международным стандартам и
-								отвечать потребностям экономики и общества нашей страны.
-							</Typography>
-							<Typography variant='body1' paragraph>
-								Приглашаю вас к активному сотрудничеству и диалогу. Вместе мы
-								сможем построить эффективную систему высшего образования,
-								которая станет основой для процветания и развития нашей страны.
-							</Typography>
-							<Box sx={{ mt: 2 }}>
-								<Typography variant='h6' component='p' sx={{ fontWeight: 700 }}>
-									Абдурахманов Иброхим Юлчиевич
-								</Typography>
-								<Typography variant='subtitle1' component='p'>
-									Министр высшего образования Республики Узбекистан
-								</Typography>
-							</Box>
-						</Grid>
-					</Grid>
+					)}
 				</Container>
 			</Box>
 
 			{/* Quick Links Section */}
-			<Box sx={{ py: 6 }}>
+			<Box sx={{ py: 6, backgroundColor: '#f0f0f0' }}>
 				<Container>
 					<Typography
 						variant='h4'
 						component='h2'
-						sx={{
-							fontWeight: 700,
-							color: 'primary.main',
-							mb: 4,
-							textAlign: 'center',
-						}}
+						sx={{ fontWeight: 700, mb: 4, color: 'primary.main' }}
 					>
-						Полезные ресурсы
+						Быстрые ссылки
 					</Typography>
-
-					<Grid container spacing={3}>
+					<Grid container spacing={2}>
 						{quickLinks.map(link => (
-							<Grid item xs={6} sm={4} md={2} key={link.id}>
+							<Grid size={2} key={link.id}>
 								<Link
 									href={link.link}
 									passHref
@@ -458,38 +377,19 @@ export default function HomePage({ params }: HomePageProps) {
 											flexDirection: 'column',
 											alignItems: 'center',
 											p: 2,
-											border: '1px solid #e0e0e0',
-											borderRadius: 2,
+											backgroundColor: 'white',
 											height: '100%',
-											transition: 'all 0.3s',
+											borderRadius: 2,
+											boxShadow: 1,
+											transition: '0.3s',
 											'&:hover': {
-												transform: 'translateY(-5px)',
-												boxShadow: 3,
+												boxShadow: 4,
+												transform: 'translateY(-3px)',
 											},
 										}}
 									>
-										<Box
-											sx={{
-												width: 50,
-												height: 50,
-												display: 'flex',
-												justifyContent: 'center',
-												alignItems: 'center',
-												mb: 1,
-											}}
-										>
-											<Image
-												src={link.icon || '/placeholder.svg'}
-												alt={link.title}
-												width={30}
-												height={30}
-											/>
-										</Box>
-										<Typography
-											variant='body2'
-											align='center'
-											sx={{ color: 'text.primary' }}
-										>
+										{link.icon}
+										<Typography variant='body2' align='center' sx={{ mt: 1 }}>
 											{link.title}
 										</Typography>
 									</Box>
@@ -497,93 +397,6 @@ export default function HomePage({ params }: HomePageProps) {
 							</Grid>
 						))}
 					</Grid>
-				</Container>
-			</Box>
-
-			{/* Statistics Section */}
-			<Box sx={{ py: 6, backgroundColor: 'primary.main', color: 'white' }}>
-				<Container>
-					<Typography
-						variant='h4'
-						component='h2'
-						sx={{ fontWeight: 700, mb: 4, textAlign: 'center' }}
-					>
-						Высшее образование в цифрах
-					</Typography>
-
-					<Grid container spacing={4} justifyContent='center'>
-						<Grid item xs={6} sm={3}>
-							<Box sx={{ textAlign: 'center' }}>
-								<Typography variant='h3' component='p' sx={{ fontWeight: 700 }}>
-									120+
-								</Typography>
-								<Typography variant='body1'>
-									Высших учебных заведений
-								</Typography>
-							</Box>
-						</Grid>
-						<Grid item xs={6} sm={3}>
-							<Box sx={{ textAlign: 'center' }}>
-								<Typography variant='h3' component='p' sx={{ fontWeight: 700 }}>
-									500K+
-								</Typography>
-								<Typography variant='body1'>Студентов</Typography>
-							</Box>
-						</Grid>
-						<Grid item xs={6} sm={3}>
-							<Box sx={{ textAlign: 'center' }}>
-								<Typography variant='h3' component='p' sx={{ fontWeight: 700 }}>
-									35K+
-								</Typography>
-								<Typography variant='body1'>Преподавателей</Typography>
-							</Box>
-						</Grid>
-						<Grid item xs={6} sm={3}>
-							<Box sx={{ textAlign: 'center' }}>
-								<Typography variant='h3' component='p' sx={{ fontWeight: 700 }}>
-									200+
-								</Typography>
-								<Typography variant='body1'>Международных партнеров</Typography>
-							</Box>
-						</Grid>
-					</Grid>
-				</Container>
-			</Box>
-
-			{/* Call to Action */}
-			<Box sx={{ py: 6 }}>
-				<Container>
-					<Box
-						sx={{
-							backgroundColor: '#f5f5f5',
-							borderRadius: 2,
-							p: 4,
-							textAlign: 'center',
-						}}
-					>
-						<Typography
-							variant='h4'
-							component='h2'
-							sx={{ fontWeight: 700, color: 'primary.main', mb: 2 }}
-						>
-							Остались вопросы?
-						</Typography>
-						<Typography
-							variant='body1'
-							sx={{ mb: 3, maxWidth: 700, mx: 'auto' }}
-						>
-							Свяжитесь с нами для получения дополнительной информации о
-							программах, поступлении и других вопросах.
-						</Typography>
-						<Button
-							variant='contained'
-							size='large'
-							component={Link}
-							href={`/${lang}/contacts`}
-						>
-							Связаться с нами
-						</Button>
-					</Box>
 				</Container>
 			</Box>
 		</>

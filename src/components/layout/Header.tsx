@@ -3,17 +3,15 @@
 import type React from 'react'
 
 import { AuthTokenService } from '@/src/service/auth-token.service'
-import { Language, Menu as MenuIcon, Person } from '@mui/icons-material'
+import { Menu as MenuIcon, Person } from '@mui/icons-material'
 import {
 	AppBar,
 	Box,
 	Button,
 	Container,
-	FormControl,
 	IconButton,
 	Menu,
 	MenuItem,
-	Select,
 	Toolbar,
 	Typography,
 	type SelectChangeEvent,
@@ -105,10 +103,10 @@ const Header = ({ transparent = false }: HeaderProps) => {
 						<Link href={`/${language}`}>
 							<Box sx={{ display: 'flex', alignItems: 'center' }}>
 								<Image
-									src='/logo.png'
+									src='/logo.svg'
 									alt='Министерство Высшего Образования'
-									width={40}
-									height={40}
+									width={80}
+									height={80}
 								/>
 								<Typography
 									variant='h6'
@@ -120,7 +118,7 @@ const Header = ({ transparent = false }: HeaderProps) => {
 										textDecoration: 'none',
 									}}
 								>
-									Министерство Высшего Образования
+									ДИ кафедра
 								</Typography>
 							</Box>
 						</Link>
@@ -165,11 +163,7 @@ const Header = ({ transparent = false }: HeaderProps) => {
 									<Typography textAlign='center'>Новости</Typography>
 								</Link>
 							</MenuItem>
-							<MenuItem onClick={handleCloseNavMenu}>
-								<Link href={`/${language}/documents`}>
-									<Typography textAlign='center'>Документы</Typography>
-								</Link>
-							</MenuItem>
+
 							<MenuItem onClick={handleCloseNavMenu}>
 								<Link href={`/${language}/teachers`}>
 									<Typography textAlign='center'>Преподаватели</Typography>
@@ -194,7 +188,7 @@ const Header = ({ transparent = false }: HeaderProps) => {
 						<Link href={`/${language}`}>
 							<Box sx={{ display: 'flex', alignItems: 'center' }}>
 								<Image
-									src='/logo.png'
+									src='/logo.svg'
 									alt='Министерство Высшего Образования'
 									width={30}
 									height={30}
@@ -209,7 +203,7 @@ const Header = ({ transparent = false }: HeaderProps) => {
 										textDecoration: 'none',
 									}}
 								>
-									МВО РУз
+									ДИ кафедра
 								</Typography>
 							</Box>
 						</Link>
@@ -237,13 +231,7 @@ const Header = ({ transparent = false }: HeaderProps) => {
 						>
 							Новости
 						</Button>
-						<Button
-							component={Link}
-							href={`/${language}/documents`}
-							sx={{ my: 2, color: 'white', display: 'block' }}
-						>
-							Документы
-						</Button>
+
 						<Button
 							component={Link}
 							href={`/${language}/teachers`}
@@ -262,7 +250,7 @@ const Header = ({ transparent = false }: HeaderProps) => {
 
 					{/* Language selector and login button */}
 					<Box sx={{ display: 'flex', alignItems: 'center' }}>
-						<FormControl variant='standard' sx={{ m: 1, minWidth: 80 }}>
+						{/* <FormControl variant='standard' sx={{ m: 1, minWidth: 80 }}>
 							<Select
 								value={language}
 								onChange={handleLanguageChange}
@@ -278,7 +266,7 @@ const Header = ({ transparent = false }: HeaderProps) => {
 								<MenuItem value='ru'>RU</MenuItem>
 								<MenuItem value='en'>EN</MenuItem>
 							</Select>
-						</FormControl>
+						</FormControl> */}
 
 						{isAuthenticated ? (
 							<Button

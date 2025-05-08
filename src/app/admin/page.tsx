@@ -90,7 +90,7 @@ export default function AdminDashboard() {
 
 			{/* Statistics Cards */}
 			<Grid container spacing={3} sx={{ mb: 4 }}>
-				<Grid item xs={12} sm={6} md={3}>
+				<Grid size={3}>
 					<Paper
 						elevation={2}
 						sx={{
@@ -131,7 +131,7 @@ export default function AdminDashboard() {
 						</Typography>
 					</Paper>
 				</Grid>
-				<Grid item xs={12} sm={6} md={3}>
+				<Grid size={3}>
 					<Paper
 						elevation={2}
 						sx={{
@@ -172,7 +172,7 @@ export default function AdminDashboard() {
 						</Typography>
 					</Paper>
 				</Grid>
-				<Grid item xs={12} sm={6} md={3}>
+				<Grid size={3}>
 					<Paper
 						elevation={2}
 						sx={{
@@ -213,7 +213,7 @@ export default function AdminDashboard() {
 						</Typography>
 					</Paper>
 				</Grid>
-				<Grid item xs={12} sm={6} md={3}>
+				<Grid size={3}>
 					<Paper
 						elevation={2}
 						sx={{
@@ -258,7 +258,7 @@ export default function AdminDashboard() {
 
 			<Grid container spacing={3}>
 				{/* Recent News */}
-				<Grid item xs={12} md={6}>
+				<Grid size={6}>
 					<Card elevation={2}>
 						<CardHeader
 							title='Последние новости'
@@ -330,13 +330,13 @@ export default function AdminDashboard() {
 				</Grid>
 
 				{/* Quick Actions */}
-				<Grid item xs={12} md={6}>
+				<Grid size={6}>
 					<Card elevation={2} sx={{ mb: 3 }}>
 						<CardHeader title='Быстрые действия' />
 						<Divider />
 						<CardContent>
 							<Grid container spacing={2}>
-								<Grid item xs={6}>
+								<Grid size={3}>
 									<Button
 										variant='contained'
 										fullWidth
@@ -347,7 +347,7 @@ export default function AdminDashboard() {
 										Добавить новость
 									</Button>
 								</Grid>
-								<Grid item xs={6}>
+								<Grid size={3}>
 									<Button
 										variant='contained'
 										fullWidth
@@ -358,7 +358,7 @@ export default function AdminDashboard() {
 										Добавить документ
 									</Button>
 								</Grid>
-								<Grid item xs={6}>
+								<Grid size={3}>
 									<Button
 										variant='contained'
 										fullWidth
@@ -369,7 +369,7 @@ export default function AdminDashboard() {
 										Добавить преподавателя
 									</Button>
 								</Grid>
-								<Grid item xs={6}>
+								<Grid size={3}>
 									<Button
 										variant='contained'
 										fullWidth
@@ -390,7 +390,7 @@ export default function AdminDashboard() {
 						<Divider />
 						<CardContent>
 							<Grid container spacing={2}>
-								<Grid item xs={4}>
+								<Grid size={3}>
 									<Box sx={{ textAlign: 'center' }}>
 										<Typography
 											variant='h4'
@@ -404,7 +404,7 @@ export default function AdminDashboard() {
 										</Typography>
 									</Box>
 								</Grid>
-								<Grid item xs={4}>
+								<Grid size={3}>
 									<Box sx={{ textAlign: 'center' }}>
 										<Typography
 											variant='h4'
@@ -418,7 +418,7 @@ export default function AdminDashboard() {
 										</Typography>
 									</Box>
 								</Grid>
-								<Grid item xs={4}>
+								<Grid size={3}>
 									<Box sx={{ textAlign: 'center' }}>
 										<Typography
 											variant='h4'

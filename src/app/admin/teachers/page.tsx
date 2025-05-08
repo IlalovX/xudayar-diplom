@@ -8,6 +8,7 @@ import {
 	Add as AddIcon,
 	Delete as DeleteIcon,
 	Edit as EditIcon,
+	NavigateNext,
 	Search as SearchIcon,
 	Visibility as VisibilityIcon,
 } from '@mui/icons-material'
@@ -15,6 +16,7 @@ import {
 	Alert,
 	Avatar,
 	Box,
+	Breadcrumbs,
 	Button,
 	CircularProgress,
 	Container,
@@ -36,6 +38,7 @@ import {
 	TextField,
 	Typography,
 } from '@mui/material'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -66,6 +69,7 @@ export default function TeachersPage() {
 				limit,
 			})
 
+			console.log('Teachers response:', response)
 			setTeachers(response.results || [])
 			setTotalPages(Math.ceil((response.count || 0) / limit))
 		} catch (err) {
@@ -92,11 +96,11 @@ export default function TeachersPage() {
 		router.push('/admin/teachers/create')
 	}
 
-	const handleEditTeacher = (id: number) => {
+	const handleEditTeacher = (id: string) => {
 		router.push(`/admin/teachers/edit/${id}`)
 	}
 
-	const handleViewTeacher = (id: number) => {
+	const handleViewTeacher = (id: string) => {
 		window.open(`/teachers/${id}`, '_blank')
 	}
 
@@ -127,12 +131,43 @@ export default function TeachersPage() {
 		setTeacherToDelete(null)
 	}
 
-	const filteredTeachers = teachers.filter(
-		item =>
-			item.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-			item.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
-			item.department.toLowerCase().includes(searchTerm.toLowerCase())
-	)
+	// Helper function to get teacher's full name
+	const getTeacherFullName = (teacher: Teacher): string => {
+		return teacher.full_name || 'Имя не указано'
+	}
+
+	// Helper function to get teacher's position
+	const getTeacherPosition = (teacher: Teacher): string => {
+		const positions = {
+			1: 'Преподаватель',
+			2: 'Доцент',
+			3: 'Профессор',
+			4: 'Заведующий кафедрой',
+		}
+
+		return (
+			positions[teacher.position_id as keyof typeof positions] ||
+			`Должность ${teacher.position_id}` ||
+			'Не указано'
+		)
+	}
+
+	// Helper function to get teacher image
+	const getTeacherImage = (teacher: Teacher): string => {
+		return teacher.logo_teacher || '/default-avatar.png'
+	}
+
+	const filteredTeachers = teachers.filter(item => {
+		const fullName = getTeacherFullName(item).toLowerCase()
+		const position = getTeacherPosition(item).toLowerCase()
+		const username = (item.username || '').toLowerCase()
+
+		return (
+			fullName.includes(searchTerm.toLowerCase()) ||
+			position.includes(searchTerm.toLowerCase()) ||
+			username.includes(searchTerm.toLowerCase())
+		)
+	})
 
 	return (
 		<Container maxWidth='xl'>
@@ -144,13 +179,27 @@ export default function TeachersPage() {
 					mb: 3,
 				}}
 			>
-				<Typography
-					variant='h4'
-					component='h1'
-					sx={{ fontWeight: 700, color: 'primary.main' }}
-				>
-					Управление преподавателями
-				</Typography>
+				<Box>
+					<Breadcrumbs
+						separator={<NavigateNext fontSize='small' />}
+						sx={{ mb: 1 }}
+					>
+						<Link
+							href='/admin'
+							style={{ textDecoration: 'none', color: 'inherit' }}
+						>
+							Главная
+						</Link>
+						<Typography color='text.primary'>Преподаватели</Typography>
+					</Breadcrumbs>
+					<Typography
+						variant='h4'
+						component='h1'
+						sx={{ fontWeight: 700, color: 'primary.main' }}
+					>
+						Управление преподавателями
+					</Typography>
+				</Box>
 				<Button
 					variant='contained'
 					startIcon={<AddIcon />}
@@ -190,7 +239,7 @@ export default function TeachersPage() {
 							<TableCell>Фото</TableCell>
 							<TableCell>ФИО</TableCell>
 							<TableCell>Должность</TableCell>
-							<TableCell>Кафедра</TableCell>
+							<TableCell>Логин</TableCell>
 							<TableCell align='right'>Действия</TableCell>
 						</TableRow>
 					</TableHead>
@@ -206,14 +255,14 @@ export default function TeachersPage() {
 								<TableRow key={item.id}>
 									<TableCell>
 										<Avatar
-											src={item.image || '/default-avatar.png'}
-											alt={item.fullName}
+											src={getTeacherImage(item)}
+											alt={getTeacherFullName(item)}
 											sx={{ width: 50, height: 50 }}
 										/>
 									</TableCell>
-									<TableCell>{item.fullName}</TableCell>
-									<TableCell>{item.position}</TableCell>
-									<TableCell>{item.department}</TableCell>
+									<TableCell>{getTeacherFullName(item)}</TableCell>
+									<TableCell>{getTeacherPosition(item)}</TableCell>
+									<TableCell>{item.username || '—'}</TableCell>
 									<TableCell align='right'>
 										<IconButton
 											color='info'
@@ -264,7 +313,8 @@ export default function TeachersPage() {
 				<DialogContent>
 					<DialogContentText>
 						Вы уверены, что хотите удалить преподавателя "
-						{teacherToDelete?.fullName}"? Это действие нельзя отменить.
+						{teacherToDelete ? getTeacherFullName(teacherToDelete) : ''}"? Это
+						действие нельзя отменить.
 					</DialogContentText>
 				</DialogContent>
 				<DialogActions>

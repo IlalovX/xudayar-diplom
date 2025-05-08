@@ -2,7 +2,6 @@
 
 import { AuthTokenService } from '@/src/service/auth-token.service'
 import { AuthService } from '@/src/service/auth.service'
-import type { User } from '@/src/types'
 import {
 	Alert,
 	Avatar,
@@ -17,6 +16,16 @@ import {
 } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+
+type User = {
+	id: string
+	full_name: string
+	logo_teacher: string
+	phone_number: string
+	position_id: number
+	role: string
+	username: string
+}
 
 export default function ProfilePage() {
 	const router = useRouter()
@@ -41,7 +50,6 @@ export default function ProfilePage() {
 			}
 
 			try {
-				// Get current user data
 				const userData = await AuthService.getCurrentUser()
 				setUser(userData)
 			} catch (err) {
@@ -97,7 +105,7 @@ export default function ProfilePage() {
 			</Typography>
 
 			<Grid container spacing={4}>
-				<Grid item xs={12} md={4}>
+				<Grid size={4}>
 					<Paper elevation={2} sx={{ p: 3 }}>
 						<Box
 							sx={{
@@ -107,12 +115,12 @@ export default function ProfilePage() {
 							}}
 						>
 							<Avatar
-								src={user?.avatar || '/default-avatar.png'}
-								alt={user?.fullName || 'Пользователь'}
+								src={user?.logo_teacher || '/default-avatar.png'}
+								alt={user?.full_name || 'Пользователь'}
 								sx={{ width: 120, height: 120, mb: 2 }}
 							/>
 							<Typography variant='h5' component='h2' gutterBottom>
-								{user?.fullName || 'Имя не указано'}
+								{user?.full_name || 'Имя не указано'}
 							</Typography>
 							<Typography variant='body1' color='text.secondary' gutterBottom>
 								Преподаватель
@@ -138,7 +146,7 @@ export default function ProfilePage() {
 					</Paper>
 				</Grid>
 
-				<Grid item xs={12} md={8}>
+				<Grid size={10}>
 					<Paper elevation={2} sx={{ p: 3 }}>
 						<Typography variant='h6' component='h3' gutterBottom>
 							Информация о пользователе
@@ -146,34 +154,34 @@ export default function ProfilePage() {
 						<Divider sx={{ mb: 2 }} />
 
 						<Grid container spacing={2}>
-							<Grid item xs={12} sm={4}>
+							<Grid size={6}>
 								<Typography variant='body2' color='text.secondary'>
 									Имя пользователя:
 								</Typography>
 							</Grid>
-							<Grid item xs={12} sm={8}>
+							<Grid size={6}>
 								<Typography variant='body1'>
 									{user?.username || 'Не указано'}
 								</Typography>
 							</Grid>
 
-							<Grid item xs={12} sm={4}>
+							<Grid size={6}>
 								<Typography variant='body2' color='text.secondary'>
-									Email:
+									Номер телефона:
 								</Typography>
 							</Grid>
-							<Grid item xs={12} sm={8}>
+							<Grid size={6}>
 								<Typography variant='body1'>
-									{user?.email || 'Не указано'}
+									{user?.phone_number || 'Не указано'}
 								</Typography>
 							</Grid>
 
-							<Grid item xs={12} sm={4}>
+							<Grid size={6}>
 								<Typography variant='body2' color='text.secondary'>
 									Роль:
 								</Typography>
 							</Grid>
-							<Grid item xs={12} sm={8}>
+							<Grid size={6}>
 								<Typography variant='body1'>
 									{user?.role === 'teacher' ? 'Преподаватель' : 'Пользователь'}
 								</Typography>

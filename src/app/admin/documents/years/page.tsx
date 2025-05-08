@@ -18,10 +18,8 @@ import {
 	DialogActions,
 	DialogContent,
 	DialogTitle,
-	FormControlLabel,
 	IconButton,
 	Paper,
-	Switch,
 	Table,
 	TableBody,
 	TableCell,
@@ -51,10 +49,9 @@ export default function YearsPage() {
 		handleSubmit,
 		reset,
 		formState: { errors },
-	} = useForm<{ name: string; isActive: boolean }>({
+	} = useForm<{ year: string }>({
 		defaultValues: {
-			name: '',
-			isActive: true,
+			year: '',
 		},
 	})
 
@@ -67,7 +64,7 @@ export default function YearsPage() {
 		setError(null)
 		try {
 			const response = await EducationYearService.getAll()
-			setYears(response.results || [])
+			setYears(response || [])
 		} catch (err) {
 			setError('Не удалось загрузить учебные годы')
 			console.error('Error fetching years:', err)
@@ -79,16 +76,10 @@ export default function YearsPage() {
 	const handleOpenDialog = (year?: EducationYear) => {
 		if (year) {
 			setEditingYear(year)
-			reset({
-				name: year.name,
-				isActive: year.isActive,
-			})
+			reset({ year: year.year })
 		} else {
 			setEditingYear(null)
-			reset({
-				name: '',
-				isActive: true,
-			})
+			reset({ year: '' })
 		}
 		setDialogOpen(true)
 	}
@@ -97,24 +88,23 @@ export default function YearsPage() {
 		setDialogOpen(false)
 	}
 
-	const onSubmit = async (data: { name: string; isActive: boolean }) => {
+	const onSubmit = async (data: { year: string }) => {
 		setIsSubmitting(true)
 		setError(null)
 
 		try {
 			if (editingYear) {
-				// Update existing year
 				const updatedYear = await EducationYearService.update(
 					editingYear.id,
 					data
 				)
+
 				setYears(
-					years.map(year =>
-						year.id === editingYear.id ? { ...year, ...updatedYear } : year
+					years.map(y =>
+						y.id === editingYear.id ? { ...y, ...updatedYear } : y
 					)
 				)
 			} else {
-				// Create new year
 				const newYear = await EducationYearService.create(data)
 				setYears([...years, newYear])
 			}
@@ -137,8 +127,8 @@ export default function YearsPage() {
 
 		setIsDeleting(true)
 		try {
-			await EducationYearService.delete(yearToDelete.id)
-			setYears(years.filter(year => year.id !== yearToDelete.id))
+			await EducationYearService.delete(+yearToDelete.id)
+			setYears(years.filter(y => y.id !== yearToDelete.id))
 			setDeleteDialogOpen(false)
 			setYearToDelete(null)
 		} catch (err) {
@@ -196,29 +186,21 @@ export default function YearsPage() {
 				<Table>
 					<TableHead>
 						<TableRow>
-							<TableCell>Название</TableCell>
-							<TableCell>Статус</TableCell>
+							<TableCell>Год</TableCell>
 							<TableCell align='right'>Действия</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
 						{isLoading ? (
 							<TableRow>
-								<TableCell colSpan={3} align='center' sx={{ py: 3 }}>
+								<TableCell colSpan={2} align='center' sx={{ py: 3 }}>
 									<CircularProgress />
 								</TableCell>
 							</TableRow>
 						) : years.length > 0 ? (
 							years.map(year => (
 								<TableRow key={year.id}>
-									<TableCell>{year.name}</TableCell>
-									<TableCell>
-										{year.isActive ? (
-											<Typography color='success.main'>Активный</Typography>
-										) : (
-											<Typography color='text.secondary'>Неактивный</Typography>
-										)}
-									</TableCell>
+									<TableCell>{year.year}</TableCell>
 									<TableCell align='right'>
 										<IconButton
 											color='primary'
@@ -237,7 +219,7 @@ export default function YearsPage() {
 							))
 						) : (
 							<TableRow>
-								<TableCell colSpan={3} align='center'>
+								<TableCell colSpan={2} align='center'>
 									Учебные годы не найдены
 								</TableCell>
 							</TableRow>
@@ -246,7 +228,7 @@ export default function YearsPage() {
 				</Table>
 			</TableContainer>
 
-			{/* Year Form Dialog */}
+			{/* Dialog for adding/editing year */}
 			<Dialog
 				open={dialogOpen}
 				onClose={handleCloseDialog}
@@ -259,36 +241,18 @@ export default function YearsPage() {
 				<DialogContent>
 					<Box component='form' noValidate sx={{ mt: 1 }}>
 						<Controller
-							name='name'
+							name='year'
 							control={control}
-							rules={{ required: 'Название обязательно' }}
+							rules={{ required: 'Год обязателен' }}
 							render={({ field }) => (
 								<TextField
 									{...field}
 									margin='normal'
 									required
 									fullWidth
-									label='Название учебного года'
-									error={!!errors.name}
-									helperText={errors.name?.message}
-								/>
-							)}
-						/>
-
-						<Controller
-							name='isActive'
-							control={control}
-							render={({ field: { value, onChange } }) => (
-								<FormControlLabel
-									control={
-										<Switch
-											checked={value}
-											onChange={e => onChange(e.target.checked)}
-											color='primary'
-										/>
-									}
-									label='Активный учебный год'
-									sx={{ mt: 2 }}
+									label='Учебный год'
+									error={!!errors.year}
+									helperText={errors.year?.message}
 								/>
 							)}
 						/>
@@ -313,7 +277,7 @@ export default function YearsPage() {
 				<DialogTitle>Подтверждение удаления</DialogTitle>
 				<DialogContent>
 					<Typography>
-						Вы уверены, что хотите удалить учебный год "{yearToDelete?.name}"?
+						Вы уверены, что хотите удалить учебный год "{yearToDelete?.year}"?
 						Это действие нельзя отменить.
 					</Typography>
 				</DialogContent>

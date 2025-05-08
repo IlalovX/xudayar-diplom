@@ -8,11 +8,14 @@ import {
 	Add as AddIcon,
 	Delete as DeleteIcon,
 	Edit as EditIcon,
+	Image as ImageIcon,
 	Search as SearchIcon,
 	Visibility as VisibilityIcon,
 } from '@mui/icons-material'
 import {
 	Alert,
+	Avatar,
+	AvatarGroup,
 	Box,
 	Button,
 	CircularProgress,
@@ -22,6 +25,7 @@ import {
 	DialogContent,
 	DialogContentText,
 	DialogTitle,
+	Grid,
 	IconButton,
 	InputAdornment,
 	Pagination,
@@ -49,6 +53,8 @@ export default function NewsPage() {
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 	const [newsToDelete, setNewsToDelete] = useState<News | null>(null)
 	const [isDeleting, setIsDeleting] = useState(false)
+	const [selectedImages, setSelectedImages] = useState<string[]>([])
+	const [imageDialogOpen, setImageDialogOpen] = useState(false)
 
 	const limit = 10
 
@@ -66,7 +72,7 @@ export default function NewsPage() {
 				// Add search parameter if needed in your API
 			})
 
-			setNews(response.results || [])
+			setNews(response || [])
 			setTotalPages(Math.ceil((response.count || 0) / limit))
 		} catch (err) {
 			setError('Не удалось загрузить новости')
@@ -127,8 +133,18 @@ export default function NewsPage() {
 		setNewsToDelete(null)
 	}
 
-	const filteredNews = news.filter(item =>
-		item.title.toLowerCase().includes(searchTerm.toLowerCase())
+	const handleViewImages = (newsItem: News) => {
+		if (newsItem.images) {
+			const imageUrls = Object.values(newsItem.images)
+			setSelectedImages(imageUrls)
+			setImageDialogOpen(true)
+		}
+	}
+
+	const filteredNews = news.filter(
+		item =>
+			item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+			(item.text && item.text.toLowerCase().includes(searchTerm.toLowerCase()))
 	)
 
 	return (
@@ -185,6 +201,7 @@ export default function NewsPage() {
 					<TableHead>
 						<TableRow>
 							<TableCell>Заголовок</TableCell>
+							<TableCell>Изображения</TableCell>
 							<TableCell>Дата создания</TableCell>
 							<TableCell>Дата обновления</TableCell>
 							<TableCell align='right'>Действия</TableCell>
@@ -193,7 +210,7 @@ export default function NewsPage() {
 					<TableBody>
 						{isLoading ? (
 							<TableRow>
-								<TableCell colSpan={4} align='center' sx={{ py: 3 }}>
+								<TableCell colSpan={5} align='center' sx={{ py: 3 }}>
 									<CircularProgress />
 								</TableCell>
 							</TableRow>
@@ -202,18 +219,51 @@ export default function NewsPage() {
 								<TableRow key={item.id}>
 									<TableCell>{item.title}</TableCell>
 									<TableCell>
-										{new Date(item.createdAt).toLocaleDateString()}
+										{item.images && Object.keys(item.images).length > 0 ? (
+											<Box sx={{ display: 'flex', alignItems: 'center' }}>
+												<AvatarGroup
+													max={3}
+													sx={{ cursor: 'pointer' }}
+													onClick={() => handleViewImages(item)}
+												>
+													{Object.values(item.images).map((imgUrl, index) => (
+														<Avatar
+															key={index}
+															src={imgUrl}
+															alt={`Image ${index + 1}`}
+														/>
+													))}
+												</AvatarGroup>
+												<IconButton
+													size='small'
+													onClick={() => handleViewImages(item)}
+												>
+													<ImageIcon />
+												</IconButton>
+											</Box>
+										) : (
+											'Нет изображений'
+										)}
 									</TableCell>
 									<TableCell>
-										{new Date(item.updatedAt).toLocaleDateString()}
+										{item.createdAt
+											? new Date(item.createdAt).toLocaleDateString()
+											: '—'}
+									</TableCell>
+									<TableCell>
+										{item.updatedAt
+											? new Date(item.updatedAt).toLocaleDateString()
+											: '—'}
 									</TableCell>
 									<TableCell align='right'>
-										<IconButton
-											color='info'
-											onClick={() => handleViewNews(item.slug)}
-										>
-											<VisibilityIcon />
-										</IconButton>
+										{item.slug && (
+											<IconButton
+												color='info'
+												onClick={() => handleViewNews(item.slug as string)}
+											>
+												<VisibilityIcon />
+											</IconButton>
+										)}
 										<IconButton
 											color='primary'
 											onClick={() => handleEditNews(item.id)}
@@ -231,7 +281,7 @@ export default function NewsPage() {
 							))
 						) : (
 							<TableRow>
-								<TableCell colSpan={4} align='center'>
+								<TableCell colSpan={5} align='center'>
 									Новости не найдены
 								</TableCell>
 							</TableRow>
@@ -271,6 +321,38 @@ export default function NewsPage() {
 					>
 						{isDeleting ? <CircularProgress size={24} /> : 'Удалить'}
 					</Button>
+				</DialogActions>
+			</Dialog>
+
+			{/* Image Preview Dialog */}
+			<Dialog
+				open={imageDialogOpen}
+				onClose={() => setImageDialogOpen(false)}
+				maxWidth='md'
+				fullWidth
+			>
+				<DialogTitle>Изображения</DialogTitle>
+				<DialogContent>
+					<Grid container spacing={2}>
+						{selectedImages.map((imgUrl, index) => (
+							<Grid size={4} key={index}>
+								<Box
+									component='img'
+									src={imgUrl}
+									alt={`Image ${index + 1}`}
+									sx={{
+										width: '100%',
+										height: 'auto',
+										borderRadius: 1,
+										boxShadow: 1,
+									}}
+								/>
+							</Grid>
+						))}
+					</Grid>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={() => setImageDialogOpen(false)}>Закрыть</Button>
 				</DialogActions>
 			</Dialog>
 		</Container>

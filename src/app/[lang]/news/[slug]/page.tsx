@@ -1,13 +1,21 @@
+'use client'
+
+import { NewsService } from '@/src/service/news.service'
 import {
-	CalendarToday as CalendarIcon,
-	Person as PersonIcon,
-	Share as ShareIcon,
+	ArrowBack as ArrowBackIcon,
+	CalendarMonth as CalendarIcon,
+	Visibility as VisibilityIcon,
 } from '@mui/icons-material'
 import {
+	Alert,
 	Box,
 	Breadcrumbs,
 	Button,
+	Card,
+	CardContent,
+	CardMedia,
 	Chip,
+	CircularProgress,
 	Container,
 	Divider,
 	Grid,
@@ -16,265 +24,366 @@ import {
 } from '@mui/material'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
-interface NewsDetailPageProps {
-	params: {
-		lang: string
-		slug: string
-	}
-}
-
-export default function NewsDetailPage({ params }: NewsDetailPageProps) {
-	const { lang, slug } = params
+export default function NewsDetailPage() {
+	// Get the language and slug from the URL
+	const params = useParams()
+	const lang = (params?.lang as string) || 'ru'
+	const slug = params?.slug as string
 
 	// Локализованные тексты
 	const texts = {
 		uz: {
 			breadcrumbHome: 'Bosh sahifa',
 			breadcrumbNews: 'Yangiliklar',
-			author: 'Muallif',
-			date: 'Sana',
-			share: 'Ulashish',
 			category: 'Kategoriya',
+			publishDate: 'Nashr sanasi',
+			views: "Ko'rishlar",
+			backToNews: 'Yangiliklariga qaytish',
 			relatedNews: 'Tegishli yangiliklar',
-			backToNews: 'Yangiliklarga qaytish',
+			readMore: 'Batafsil',
+			notFound: 'Yangilik topilmadi',
+			error: 'Xatolik yuz berdi',
+			retry: "Qayta urinib ko'ring",
+			loading: 'Yuklanmoqda...',
 		},
 		ru: {
 			breadcrumbHome: 'Главная',
 			breadcrumbNews: 'Новости',
-			author: 'Автор',
-			date: 'Дата',
-			share: 'Поделиться',
 			category: 'Категория',
-			relatedNews: 'Похожие новости',
+			publishDate: 'Дата публикации',
+			views: 'Просмотры',
 			backToNews: 'Вернуться к новостям',
+			relatedNews: 'Связанные новости',
+			readMore: 'Подробнее',
+			notFound: 'Новость не найдена',
+			error: 'Произошла ошибка',
+			retry: 'Повторить попытку',
+			loading: 'Загрузка...',
 		},
 		en: {
 			breadcrumbHome: 'Home',
 			breadcrumbNews: 'News',
-			author: 'Author',
-			date: 'Date',
-			share: 'Share',
 			category: 'Category',
-			relatedNews: 'Related News',
-			backToNews: 'Back to News',
+			publishDate: 'Publish date',
+			views: 'Views',
+			backToNews: 'Back to news',
+			relatedNews: 'Related news',
+			readMore: 'Read more',
+			notFound: 'News not found',
+			error: 'An error occurred',
+			retry: 'Try again',
+			loading: 'Loading...',
 		},
 	}
 
 	const t = texts[lang as keyof typeof texts] || texts.ru
 
-	// Моковые данные для новости
-	// В реальном приложении здесь будет запрос к API для получения новости по slug
-	const newsItem = {
-		id: 1,
-		title: 'Встреча с представителями международных университетов',
-		content: `
-      <p>Министр высшего образования провел встречу с представителями ведущих международных университетов для обсуждения вопросов сотрудничества в области высшего образования.</p>
-      
-      <p>На встрече обсуждались вопросы развития академической мобильности студентов и преподавателей, реализации совместных образовательных программ, проведения совместных научных исследований и другие вопросы сотрудничества.</p>
-      
-      <p>Представители международных университетов выразили заинтересованность в развитии сотрудничества с высшими учебными заведениями Узбекистана и готовность оказать содействие в повышении качества высшего образования в стране.</p>
-      
-      <p>По итогам встречи были достигнуты договоренности о проведении ряда совместных мероприятий, направленных на развитие сотрудничества в области высшего образования.</p>
-    `,
-		date: '2023-05-15',
-		image: '/news-1.jpg',
-		author: 'Пресс-служба Министерства высшего образования',
-		category: 'Международное сотрудничество',
-		tags: ['международное сотрудничество', 'образование', 'университеты'],
+	// State for news data
+	const [newsItem, setNewsItem] = useState<any | null>(null)
+	const [relatedNews, setRelatedNews] = useState<any[]>([])
+	const [loading, setLoading] = useState(true)
+	const [error, setError] = useState<string | null>(null)
+
+	// Fetch news data
+	const fetchNewsDetail = async () => {
+		if (!slug) return
+
+		setLoading(true)
+		setError(null)
+		try {
+			// First try to get all news and find the one with matching slug
+			const response = await NewsService.getAll()
+
+			if (response) {
+				const foundNews = response.find(
+					(news: any) => news.slug === slug || news.id.toString() === slug
+				)
+
+				if (foundNews) {
+					setNewsItem(foundNews)
+
+					// Get related news (same category, excluding current)
+					const related = response
+						.filter(
+							(news: any) =>
+								news.id !== foundNews.id && news.category === foundNews.category
+						)
+						.slice(0, 3)
+
+					setRelatedNews(related)
+				} else {
+					// If not found in list, try direct fetch by ID
+					try {
+						const directResponse = await NewsService.getById(
+							Number(slug) || slug
+						)
+						if (directResponse) {
+							setNewsItem(directResponse)
+
+							// Get some random news for related
+							const related = response.data
+								.filter((news: any) => news.id !== directResponse.id)
+								.slice(0, 3)
+
+							setRelatedNews(related)
+						} else {
+							setError(t.notFound)
+						}
+					} catch (err) {
+						console.error('Error fetching news by ID:', err)
+						setError(t.notFound)
+					}
+				}
+			} else {
+				setError(t.notFound)
+			}
+		} catch (err) {
+			console.error('Error fetching news:', err)
+			setError(t.error)
+		} finally {
+			setLoading(false)
+		}
 	}
 
-	// Моковые данные для похожих новостей
-	const relatedNews = [
-		{
-			id: 5,
-			title: 'Подписание меморандума с Кембриджским университетом',
-			date: '2023-04-20',
-			image: '/news-5.png',
-			slug: 'cambridge-university-memorandum',
-		},
-		{
-			id: 4,
-			title: 'Международная конференция по инновациям в образовании',
-			date: '2023-04-28',
-			image: '/news-4.png',
-			slug: 'international-conference-on-education-innovations',
-		},
-		{
-			id: 8,
-			title: 'Встреча с представителями бизнеса',
-			date: '2023-04-05',
-			image: '/news-8.png',
-			slug: 'meeting-with-business-representatives',
-		},
-	]
+	// Initial data fetch
+	useEffect(() => {
+		fetchNewsDetail()
+	}, [slug])
+
+	// Helper function to get image URL
+	const getImageUrl = (news: any) => {
+		if (news.images && Object.values(news.images)[0]) {
+			return Object.values(news.images)[0] as string
+		}
+		if (news.image) {
+			return news.image
+		}
+		return '/placeholder.svg'
+	}
+
+	// Helper function to get news slug
+	const getNewsSlug = (news: any) => {
+		return news.slug || news.id
+	}
+
+	// Helper function to get news content
+	const getNewsContent = (news: any) => {
+		return news.content || news.text || news.description || ''
+	}
+
+	// Helper function to get category name
+	const getCategoryName = (categoryId: number) => {
+		const categories: Record<number, string> = {
+			1: 'Образование',
+			2: 'Наука',
+			3: 'Международное сотрудничество',
+			4: 'Мероприятия',
+			5: 'Объявления',
+		}
+		return categories[categoryId] || 'Общее'
+	}
+
+	if (loading) {
+		return (
+			<Container sx={{ py: 10, textAlign: 'center' }}>
+				<CircularProgress />
+				<Typography sx={{ mt: 2 }}>{t.loading}</Typography>
+			</Container>
+		)
+	}
+
+	if (error) {
+		return (
+			<Container sx={{ py: 10 }}>
+				<Alert
+					severity='error'
+					action={
+						<Button color='inherit' size='small' onClick={fetchNewsDetail}>
+							{t.retry}
+						</Button>
+					}
+				>
+					{error}
+				</Alert>
+				<Button
+					component={Link}
+					href={`/${lang}/news`}
+					startIcon={<ArrowBackIcon />}
+					sx={{ mt: 3 }}
+				>
+					{t.backToNews}
+				</Button>
+			</Container>
+		)
+	}
+
+	if (!newsItem) {
+		return (
+			<Container sx={{ py: 10 }}>
+				<Alert severity='info'>{t.notFound}</Alert>
+				<Button
+					component={Link}
+					href={`/${lang}/news`}
+					startIcon={<ArrowBackIcon />}
+					sx={{ mt: 3 }}
+				>
+					{t.backToNews}
+				</Button>
+			</Container>
+		)
+	}
 
 	return (
 		<>
 			<Box sx={{ bgcolor: '#f5f5f5', py: 3 }}>
 				<Container>
 					<Breadcrumbs aria-label='breadcrumb'>
-						<Link href={`/${lang}`} passHref>
-							{t.breadcrumbHome}
-						</Link>
-						<Link href={`/${lang}/news`} passHref>
-							{t.breadcrumbNews}
-						</Link>
+						<Link href={`/${lang}`}>{t.breadcrumbHome}</Link>
+						<Link href={`/${lang}/news`}>{t.breadcrumbNews}</Link>
 						<Typography color='text.primary'>{newsItem.title}</Typography>
 					</Breadcrumbs>
 				</Container>
 			</Box>
 
 			<Container sx={{ py: 5 }}>
-				<Paper elevation={2} sx={{ p: { xs: 2, md: 4 }, borderRadius: 2 }}>
-					<Typography
-						variant='h4'
-						component='h1'
-						gutterBottom
-						sx={{ fontWeight: 700, color: 'primary.main' }}
-					>
-						{newsItem.title}
-					</Typography>
-
-					<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 3 }}>
-						<Box sx={{ display: 'flex', alignItems: 'center' }}>
-							<CalendarIcon
-								fontSize='small'
-								sx={{ mr: 0.5, color: 'text.secondary' }}
-							/>
-							<Typography variant='body2' color='text.secondary'>
-								{t.date}: {new Date(newsItem.date).toLocaleDateString()}
-							</Typography>
-						</Box>
-						<Box sx={{ display: 'flex', alignItems: 'center' }}>
-							<PersonIcon
-								fontSize='small'
-								sx={{ mr: 0.5, color: 'text.secondary' }}
-							/>
-							<Typography variant='body2' color='text.secondary'>
-								{t.author}: {newsItem.author}
-							</Typography>
-						</Box>
-						<Chip label={newsItem.category} size='small' color='primary' />
-					</Box>
-
-					<Box
-						sx={{
-							position: 'relative',
-							width: '100%',
-							height: 400,
-							mb: 3,
-							borderRadius: 1,
-							overflow: 'hidden',
-						}}
-					>
-						<Image
-							src={newsItem.image || '/placeholder.svg'}
-							alt={newsItem.title}
-							fill
-							style={{ objectFit: 'cover' }}
-						/>
-					</Box>
-
-					<Box
-						sx={{ '& p': { mb: 2 } }}
-						dangerouslySetInnerHTML={{ __html: newsItem.content }}
-					/>
-
-					<Divider sx={{ my: 3 }} />
-
-					<Box
-						sx={{
-							display: 'flex',
-							justifyContent: 'space-between',
-							alignItems: 'center',
-							flexWrap: 'wrap',
-						}}
-					>
-						<Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-							{newsItem.tags.map(tag => (
-								<Chip key={tag} label={tag} size='small' variant='outlined' />
-							))}
-						</Box>
-						<Button startIcon={<ShareIcon />} variant='outlined' size='small'>
-							{t.share}
-						</Button>
-					</Box>
-				</Paper>
-
-				<Box sx={{ mt: 5 }}>
-					<Typography
-						variant='h5'
-						component='h2'
-						gutterBottom
-						sx={{ fontWeight: 700, color: 'primary.main' }}
-					>
-						{t.relatedNews}
-					</Typography>
-					<Grid container spacing={3}>
-						{relatedNews.map(news => (
-							<Grid item xs={12} sm={6} md={4} key={news.id}>
-								<Paper
-									elevation={2}
-									sx={{
-										display: 'flex',
-										flexDirection: 'column',
-										height: '100%',
-										transition: 'transform 0.3s',
-										'&:hover': { transform: 'translateY(-5px)' },
-									}}
+				<Grid container spacing={4}>
+					{/* Main content */}
+					<Grid size={8}>
+						<Paper elevation={0} sx={{ overflow: 'hidden', borderRadius: 2 }}>
+							<Box sx={{ position: 'relative', height: { xs: 300, md: 400 } }}>
+								<Image
+									src={getImageUrl(newsItem) || '/placeholder.svg'}
+									alt={newsItem.title}
+									fill
+									priority
+									style={{ objectFit: 'cover' }}
+								/>
+							</Box>
+							<Box sx={{ p: { xs: 3, md: 4 } }}>
+								<Typography
+									variant='h4'
+									component='h1'
+									gutterBottom
+									sx={{ fontWeight: 700 }}
 								>
-									<Box
-										sx={{ position: 'relative', width: '100%', pt: '56.25%' }}
-									>
-										<Image
-											src={news.image || '/placeholder.svg'}
-											alt={news.title}
-											fill
-											style={{ objectFit: 'cover' }}
+									{newsItem.title}
+								</Typography>
+
+								<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 3 }}>
+									<Chip
+										icon={<CalendarIcon />}
+										label={new Date(
+											newsItem.date || newsItem.createdAt
+										).toLocaleDateString()}
+										variant='outlined'
+										size='small'
+									/>
+									{newsItem.category && (
+										<Chip
+											label={getCategoryName(newsItem.category)}
+											color='primary'
+											size='small'
 										/>
-									</Box>
-									<Box sx={{ p: 2, flexGrow: 1 }}>
-										<Typography
-											variant='subtitle1'
-											component='h3'
-											gutterBottom
-											sx={{ fontWeight: 600 }}
-										>
-											{news.title}
-										</Typography>
-										<Typography
-											variant='body2'
-											color='text.secondary'
-											sx={{ mb: 2 }}
-										>
-											{new Date(news.date).toLocaleDateString()}
-										</Typography>
-										<Button
-											component={Link}
-											href={`/${lang}/news/${news.slug}`}
+									)}
+									{newsItem.views && (
+										<Chip
+											icon={<VisibilityIcon />}
+											label={`${newsItem.views} ${t.views}`}
 											variant='outlined'
 											size='small'
-											sx={{ mt: 'auto' }}
-										>
-											{t.readMore}
-										</Button>
-									</Box>
-								</Paper>
-							</Grid>
-						))}
+										/>
+									)}
+								</Box>
+
+								<Divider sx={{ mb: 3 }} />
+
+								<Typography
+									variant='body1'
+									component='div'
+									sx={{
+										lineHeight: 1.8,
+										'& img': { maxWidth: '100%', height: 'auto', my: 2 },
+										'& p': { mb: 2 },
+										'& h2, & h3': { mt: 4, mb: 2, fontWeight: 600 },
+									}}
+									dangerouslySetInnerHTML={{ __html: getNewsContent(newsItem) }}
+								/>
+
+								<Button
+									component={Link}
+									href={`/${lang}/news`}
+									startIcon={<ArrowBackIcon />}
+									sx={{ mt: 4 }}
+								>
+									{t.backToNews}
+								</Button>
+							</Box>
+						</Paper>
 					</Grid>
-					<Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-						<Button
-							component={Link}
-							href={`/${lang}/news`}
-							variant='contained'
-							color='primary'
-						>
-							{t.backToNews}
-						</Button>
-					</Box>
-				</Box>
+
+					{/* Sidebar with related news */}
+					<Grid size={4}>
+						<Typography variant='h6' gutterBottom sx={{ fontWeight: 600 }}>
+							{t.relatedNews}
+						</Typography>
+
+						<Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+							{relatedNews.length > 0 ? (
+								relatedNews.map(news => (
+									<Card
+										key={news.id}
+										sx={{ display: 'flex', flexDirection: 'column' }}
+									>
+										<CardMedia
+											component='div'
+											sx={{ pt: '56.25%', position: 'relative' }}
+										>
+											<Image
+												src={getImageUrl(news) || '/placeholder.svg'}
+												alt={news.title}
+												fill
+												style={{ objectFit: 'cover' }}
+											/>
+										</CardMedia>
+										<CardContent>
+											<Typography
+												variant='subtitle1'
+												sx={{ fontWeight: 600, mb: 1 }}
+											>
+												{news.title}
+											</Typography>
+											<Typography
+												variant='body2'
+												color='text.secondary'
+												sx={{ mb: 2 }}
+											>
+												{new Date(
+													news.date || news.createdAt
+												).toLocaleDateString()}
+											</Typography>
+											<Button
+												component={Link}
+												href={`/${lang}/news/${getNewsSlug(news)}`}
+												variant='outlined'
+												size='small'
+												fullWidth
+											>
+												{t.readMore}
+											</Button>
+										</CardContent>
+									</Card>
+								))
+							) : (
+								<Typography variant='body2' color='text.secondary'>
+									{t.notFound}
+								</Typography>
+							)}
+						</Box>
+					</Grid>
+				</Grid>
 			</Container>
 		</>
 	)

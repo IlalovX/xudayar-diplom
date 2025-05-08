@@ -1,11 +1,9 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import type React from 'react'
+import { useEffect, useState } from 'react'
 
-import { DocumentCategoryService } from '@/src/service/docs-category.service'
-import { DocumentsService } from '@/src/service/documents.service'
-import { EducationYearService } from '@/src/service/edu-years.service'
-import type { Document, DocumentCategory, EducationYear } from '@/src/types'
 import {
 	Add as AddIcon,
 	Delete as DeleteIcon,
@@ -33,6 +31,7 @@ import {
 	Pagination,
 	Paper,
 	Select,
+	SelectChangeEvent,
 	Table,
 	TableBody,
 	TableCell,
@@ -42,12 +41,15 @@ import {
 	TextField,
 	Typography,
 } from '@mui/material'
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+
+import { DocumentCategoryService } from '@/src/service/docs-category.service'
+import { DocsDocument, DocumentsService } from '@/src/service/documents.service'
+import { EducationYearService } from '@/src/service/edu-years.service'
+import type { DocumentCategory, EducationYear } from '@/src/types'
 
 export default function DocumentsPage() {
 	const router = useRouter()
-	const [documents, setDocuments] = useState<Document[]>([])
+	const [documents, setDocuments] = useState<DocsDocument[]>([])
 	const [categories, setCategories] = useState<DocumentCategory[]>([])
 	const [years, setYears] = useState<EducationYear[]>([])
 	const [isLoading, setIsLoading] = useState(true)
@@ -58,7 +60,7 @@ export default function DocumentsPage() {
 	const [page, setPage] = useState(1)
 	const [totalPages, setTotalPages] = useState(1)
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-	const [documentToDelete, setDocumentToDelete] = useState<Document | null>(
+	const [documentToDelete, setDocumentToDelete] = useState<DocsDocument | null>(
 		null
 	)
 	const [isDeleting, setIsDeleting] = useState(false)
@@ -73,34 +75,23 @@ export default function DocumentsPage() {
 		setIsLoading(true)
 		setError(null)
 		try {
-			// Fetch categories and years if not already loaded
 			if (categories.length === 0) {
 				const categoriesData = await DocumentCategoryService.getAll()
-				setCategories(categoriesData.results || [])
+				setCategories(categoriesData || [])
 			}
-
 			if (years.length === 0) {
 				const yearsData = await EducationYearService.getAll()
-				setYears(yearsData.results || [])
+				setYears(yearsData || [])
 			}
 
-			// Fetch documents with filters
-			const params: any = {
-				page,
-				limit,
-			}
+			const params: any = { page, limit }
 
-			if (selectedCategory) {
-				params.categoryId = selectedCategory
-			}
+			if (selectedCategory) params.categoryId = selectedCategory
+			if (selectedYear) params.yearId = selectedYear
 
-			if (selectedYear) {
-				params.yearId = selectedYear
-			}
-
-			const documentsData = await DocumentsService.getAll(params)
-			setDocuments(documentsData.results || [])
-			setTotalPages(Math.ceil((documentsData.count || 0) / limit))
+			const response = await DocumentsService.getAll(params)
+			setDocuments((response as DocsDocument[]) || [])
+			setTotalPages(Math.ceil((response.length || 0) / limit))
 		} catch (err) {
 			setError('Не удалось загрузить данные')
 			console.error('Error fetching data:', err)
@@ -109,27 +100,22 @@ export default function DocumentsPage() {
 		}
 	}
 
-	const handlePageChange = (
-		event: React.ChangeEvent<unknown>,
-		value: number
-	) => {
+	const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
 		setPage(value)
 	}
 
 	const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchTerm(event.target.value)
-		setPage(1) // Reset to first page when searching
-	}
-
-	const handleCategoryChange = (
-		event: React.ChangeEvent<{ value: unknown }>
-	) => {
-		setSelectedCategory(event.target.value as string)
 		setPage(1)
 	}
 
-	const handleYearChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-		setSelectedYear(event.target.value as string)
+	const handleCategoryChange = (event: SelectChangeEvent) => {
+		setSelectedCategory(event.target.value)
+		setPage(1)
+	}
+
+	const handleYearChange = (event: SelectChangeEvent) => {
+		setSelectedYear(event.target.value)
 		setPage(1)
 	}
 
@@ -137,7 +123,7 @@ export default function DocumentsPage() {
 		router.push('/admin/documents/create')
 	}
 
-	const handleEditDocument = (id: number) => {
+	const handleEditDocument = (id: string) => {
 		router.push(`/admin/documents/edit/${id}`)
 	}
 
@@ -145,18 +131,17 @@ export default function DocumentsPage() {
 		window.open(fileUrl, '_blank')
 	}
 
-	const handleDeleteClick = (document: Document) => {
+	const handleDeleteClick = (document: DocsDocument) => {
 		setDocumentToDelete(document)
 		setDeleteDialogOpen(true)
 	}
 
 	const handleDeleteConfirm = async () => {
 		if (!documentToDelete) return
-
 		setIsDeleting(true)
 		try {
-			await DocumentsService.delete(documentToDelete.id)
-			setDocuments(documents.filter(item => item.id !== documentToDelete.id))
+			await DocumentsService.delete(+documentToDelete.id)
+			setDocuments(prev => prev.filter(doc => doc.id != documentToDelete.id))
 			setDeleteDialogOpen(false)
 			setDocumentToDelete(null)
 		} catch (err) {
@@ -172,9 +157,7 @@ export default function DocumentsPage() {
 		setDocumentToDelete(null)
 	}
 
-	const filteredDocuments = documents.filter(item =>
-		item.title.toLowerCase().includes(searchTerm.toLowerCase())
-	)
+	const filteredDocuments = documents.filter(doc => doc)
 
 	return (
 		<Container maxWidth='xl'>
@@ -210,7 +193,7 @@ export default function DocumentsPage() {
 
 			<Paper elevation={2} sx={{ mb: 3, p: 2 }}>
 				<Grid container spacing={2}>
-					<Grid item xs={12} md={6}>
+					<Grid size={5}>
 						<TextField
 							fullWidth
 							variant='outlined'
@@ -226,7 +209,7 @@ export default function DocumentsPage() {
 							}}
 						/>
 					</Grid>
-					<Grid item xs={12} md={3}>
+					<Grid size={3}>
 						<FormControl fullWidth>
 							<InputLabel>Категория</InputLabel>
 							<Select
@@ -237,13 +220,13 @@ export default function DocumentsPage() {
 								<MenuItem value=''>Все категории</MenuItem>
 								{categories.map(category => (
 									<MenuItem key={category.id} value={category.id.toString()}>
-										{category.name}
+										{category.category_name}
 									</MenuItem>
 								))}
 							</Select>
 						</FormControl>
 					</Grid>
-					<Grid item xs={12} md={3}>
+					<Grid size={2}>
 						<FormControl fullWidth>
 							<InputLabel>Учебный год</InputLabel>
 							<Select
@@ -254,7 +237,7 @@ export default function DocumentsPage() {
 								<MenuItem value=''>Все годы</MenuItem>
 								{years.map(year => (
 									<MenuItem key={year.id} value={year.id.toString()}>
-										{year.name}
+										{year.year}
 									</MenuItem>
 								))}
 							</Select>
@@ -270,48 +253,45 @@ export default function DocumentsPage() {
 							<TableCell>Название</TableCell>
 							<TableCell>Категория</TableCell>
 							<TableCell>Учебный год</TableCell>
-							<TableCell>Дата создания</TableCell>
 							<TableCell align='right'>Действия</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
 						{isLoading ? (
 							<TableRow>
-								<TableCell colSpan={5} align='center' sx={{ py: 3 }}>
+								<TableCell colSpan={5} align='center'>
 									<CircularProgress />
 								</TableCell>
 							</TableRow>
 						) : filteredDocuments.length > 0 ? (
-							filteredDocuments.map(item => (
-								<TableRow key={item.id}>
-									<TableCell>{item.title}</TableCell>
+							filteredDocuments.map(doc => (
+								<TableRow key={doc.id}>
+									<TableCell>{doc.document_name}</TableCell>
 									<TableCell>
-										{categories.find(c => c.id === item.categoryId)?.name ||
+										{categories.find(c => c.id === +doc.category_id)
+											?.category_name || '—'}
+									</TableCell>
+									<TableCell>
+										{years.find(y => y.id === doc.document_year)?.year ||
 											'Неизвестно'}
 									</TableCell>
-									<TableCell>
-										{years.find(y => y.id === item.yearId)?.name ||
-											'Неизвестно'}
-									</TableCell>
-									<TableCell>
-										{new Date(item.createdAt).toLocaleDateString()}
-									</TableCell>
+
 									<TableCell align='right'>
 										<IconButton
 											color='info'
-											onClick={() => handleDownloadDocument(item.file)}
+											onClick={() => handleDownloadDocument(doc.document)}
 										>
 											<DownloadIcon />
 										</IconButton>
 										<IconButton
 											color='primary'
-											onClick={() => handleEditDocument(item.id)}
+											onClick={() => handleEditDocument(doc.id)}
 										>
 											<EditIcon />
 										</IconButton>
 										<IconButton
 											color='error'
-											onClick={() => handleDeleteClick(item)}
+											onClick={() => handleDeleteClick(doc)}
 										>
 											<DeleteIcon />
 										</IconButton>
@@ -335,18 +315,16 @@ export default function DocumentsPage() {
 						count={totalPages}
 						page={page}
 						onChange={handlePageChange}
-						color='primary'
 					/>
 				</Box>
 			)}
 
-			{/* Delete Confirmation Dialog */}
 			<Dialog open={deleteDialogOpen} onClose={handleDeleteCancel}>
-				<DialogTitle>Подтверждение удаления</DialogTitle>
+				<DialogTitle>Удалить документ</DialogTitle>
 				<DialogContent>
 					<DialogContentText>
-						Вы уверены, что хотите удалить документ "{documentToDelete?.title}"?
-						Это действие нельзя отменить.
+						Вы уверены, что хотите удалить документ{' '}
+						<strong>{documentToDelete?.document_name}</strong>?
 					</DialogContentText>
 				</DialogContent>
 				<DialogActions>
@@ -358,7 +336,7 @@ export default function DocumentsPage() {
 						color='error'
 						disabled={isDeleting}
 					>
-						{isDeleting ? <CircularProgress size={24} /> : 'Удалить'}
+						{isDeleting ? 'Удаление...' : 'Удалить'}
 					</Button>
 				</DialogActions>
 			</Dialog>

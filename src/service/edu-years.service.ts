@@ -33,7 +33,7 @@ export const EducationYearService = {
     }
   },
 
-  async update(id: number, yearData: Partial<Omit<EducationYear, "id">>) {
+  async update(id: string, yearData: Partial<Omit<EducationYear, "id">>) {
     try {
       const { data } = await axiosInstance.put(`/api/v1/documents/year/${id}/`, yearData)
       return data
