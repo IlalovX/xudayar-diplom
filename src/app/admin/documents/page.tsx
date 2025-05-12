@@ -140,7 +140,7 @@ export default function DocumentsPage() {
 		if (!documentToDelete) return
 		setIsDeleting(true)
 		try {
-			await DocumentsService.delete(+documentToDelete.id)
+			await DocumentsService.delete(documentToDelete.id)
 			setDocuments(prev => prev.filter(doc => doc.id != documentToDelete.id))
 			setDeleteDialogOpen(false)
 			setDocumentToDelete(null)
@@ -268,7 +268,7 @@ export default function DocumentsPage() {
 								<TableRow key={doc.id}>
 									<TableCell>{doc.document_name}</TableCell>
 									<TableCell>
-										{categories.find(c => c.id === +doc.category_id)
+										{categories?.find(c => c.id == doc.category_id)
 											?.category_name || '—'}
 									</TableCell>
 									<TableCell>

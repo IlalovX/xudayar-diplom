@@ -8,14 +8,18 @@ import {
 	useUpdateDocument,
 } from '@/src/hooks/useDocuments'
 import { useGetYears } from '@/src/hooks/useEducationYears'
+import { DocumentsService } from '@/src/service/documents.service'
 
 import {
 	Add,
 	Delete as DeleteIcon,
+	Download,
 	Edit as EditIcon,
+	NavigateNext,
 } from '@mui/icons-material'
 import {
 	Box,
+	Breadcrumbs,
 	Button,
 	Container,
 	Dialog,
@@ -34,6 +38,7 @@ import {
 	TextField,
 	Typography,
 } from '@mui/material'
+import Link from 'next/link'
 
 import { useState } from 'react'
 import { useDropzone } from 'react-dropzone'
@@ -124,7 +129,7 @@ export default function DocsPage() {
 
 	const handleDelete = async (id: string) => {
 		try {
-			await deleteDocument.mutateAsync(id)
+			await DocumentsService.delete(id)
 			refetch()
 		} catch (error) {
 			console.error('Ошибка при удалении документа', error)
@@ -153,7 +158,18 @@ export default function DocsPage() {
 					Добавить
 				</Button>
 			</Box>
-
+			<Breadcrumbs separator={<NavigateNext fontSize='small' />} sx={{ mb: 1 }}>
+				<Link href='/' style={{ textDecoration: 'none', color: 'inherit' }}>
+					Главная
+				</Link>
+				<Link
+					href='/profile'
+					style={{ textDecoration: 'none', color: 'inherit' }}
+				>
+					Профиль
+				</Link>
+				<Typography color='text.primary'>Мои документы</Typography>
+			</Breadcrumbs>
 			<Paper>
 				<TableContainer>
 					<Table>
@@ -170,11 +186,23 @@ export default function DocsPage() {
 							{docs.length ? (
 								docs.map(doc => (
 									<TableRow key={doc.id}>
-										<TableCell>{doc.title}</TableCell>
+										<TableCell>{doc.document_name}</TableCell>
 										<TableCell>{doc.document_description}</TableCell>
-										<TableCell>{doc.category?.name}</TableCell>
-										<TableCell>{doc.year?.year}</TableCell>
 										<TableCell>
+											{categories.find(cat => cat.id === doc.category_id)
+												?.category_name || '—'}
+										</TableCell>
+										<TableCell>
+											{years.find(year => year.id === doc.document_year)
+												?.year || '—'}
+										</TableCell>
+
+										<TableCell>
+											<IconButton
+												onClick={() => window.open(doc.document, '_blank')}
+											>
+												<Download />
+											</IconButton>
 											<IconButton onClick={() => handleOpenDialog(doc)}>
 												<EditIcon />
 											</IconButton>

@@ -165,11 +165,6 @@ const Header = ({ transparent = false }: HeaderProps) => {
 							</MenuItem>
 
 							<MenuItem onClick={handleCloseNavMenu}>
-								<Link href={`/${language}/teachers`}>
-									<Typography textAlign='center'>Преподаватели</Typography>
-								</Link>
-							</MenuItem>
-							<MenuItem onClick={handleCloseNavMenu}>
 								<Link href={`/${language}/about`}>
 									<Typography textAlign='center'>О нас</Typography>
 								</Link>
@@ -231,14 +226,7 @@ const Header = ({ transparent = false }: HeaderProps) => {
 						>
 							Новости
 						</Button>
-
-						<Button
-							component={Link}
-							href={`/${language}/teachers`}
-							sx={{ my: 2, color: 'white', display: 'block' }}
-						>
-							Преподаватели
-						</Button>
+z
 						<Button
 							component={Link}
 							href={`/${language}/about`}

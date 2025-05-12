@@ -105,7 +105,6 @@ export default function CreateNewsPage() {
 	const removeImage = (imageId: number) => {
 		setUploadedImages(prev => prev.filter(img => img.id !== imageId))
 	}
-
 	const onSubmit = async (data: NewsFormData) => {
 		if (uploadedImages.length === 0) {
 			setError('Пожалуйста, загрузите хотя бы одно изображение')
@@ -116,17 +115,20 @@ export default function CreateNewsPage() {
 		setError(null)
 
 		try {
-			const formData = new FormData()
-			formData.append('title', data.title)
-			formData.append('text', data.text)
-
-			// Add image IDs to the form data
-			uploadedImages.forEach(img => {
-				formData.append(`images[${img.id}]`, img.url)
+			const imagesObj: Record<string, string> = {}
+			uploadedImages.forEach((img, index) => {
+				imagesObj[`photo ${index + 1}`] = img.url
 			})
 
-			await NewsService.create(formData)
-			router.push('/admin/news')
+			const payload = {
+				title: data.title,
+				text: data.text,
+				images: imagesObj,
+			}
+			console.log(payload, imagesObj)
+
+			await NewsService.create(payload)
+			router.push('/admin/news') // раскомментируй, если нужен переход после создания
 		} catch (err: any) {
 			setError(err.message || 'Произошла ошибка при создании новости')
 		} finally {

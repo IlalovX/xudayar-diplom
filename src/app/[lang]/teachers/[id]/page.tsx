@@ -234,7 +234,10 @@ export default function TeacherProfilePage({
 						<Card>
 							<Box sx={{ position: 'relative', width: '100%', pt: '100%' }}>
 								<Image
-									src={teacher.logo_teacher || '/default-avatar.png'}
+									src={
+										`http://di-nmtu.social${teacher.logo_teacher}` ||
+										'/default-avatar.png'
+									}
 									alt={teacher.full_name}
 									fill
 									style={{ objectFit: 'cover' }}

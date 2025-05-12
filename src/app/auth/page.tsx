@@ -45,10 +45,6 @@ export default function AuthPage() {
 
 			console.log('Login successful:', response)
 
-			// Check if user data is properly saved
-			// const savedUser = AuthTokenService.getUser() //AuthTokenService is not defined
-			// console.log("Saved user:", savedUser)
-
 			// Check user role and redirect accordingly
 			const userRole = response.user?.role //|| savedUser?.role //AuthTokenService is not defined
 

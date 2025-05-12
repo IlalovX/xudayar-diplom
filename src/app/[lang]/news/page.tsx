@@ -102,7 +102,6 @@ export default function NewsPage() {
 
 			if (response) {
 				setNewsItems(response)
-				console.log(newsItems)
 
 				setTotalPages(Math.ceil((response.meta?.total || response.length) / 9))
 			} else {

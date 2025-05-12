@@ -1,5 +1,7 @@
 'use client'
 
+import type React from 'react'
+
 import { NewsService } from '@/src/service/news.service'
 import {
 	ArrowBack as ArrowBackIcon,
@@ -24,12 +26,22 @@ import {
 } from '@mui/material'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+
+// Import Swiper and required modules
+import { Autoplay, Navigation, Pagination } from 'swiper/modules'
+import { Swiper, SwiperSlide } from 'swiper/react'
+
+// Import Swiper styles
+import 'swiper/css'
+import 'swiper/css/navigation'
+import 'swiper/css/pagination'
 
 export default function NewsDetailPage() {
 	// Get the language and slug from the URL
 	const params = useParams()
+	const router = useRouter()
 	const lang = (params?.lang as string) || 'ru'
 	const slug = params?.slug as string
 
@@ -86,6 +98,7 @@ export default function NewsDetailPage() {
 	const [relatedNews, setRelatedNews] = useState<any[]>([])
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
+	const [imageUrls, setImageUrls] = useState<string[]>([])
 
 	// Fetch news data
 	const fetchNewsDetail = async () => {
@@ -93,55 +106,47 @@ export default function NewsDetailPage() {
 
 		setLoading(true)
 		setError(null)
+
 		try {
-			// First try to get all news and find the one with matching slug
-			const response = await NewsService.getAll()
+			console.log('Fetching news with ID:', slug)
 
-			if (response) {
-				const foundNews = response.find(
-					(news: any) => news.slug === slug || news.id.toString() === slug
-				)
+			// Напрямую получаем новость по ID/slug
+			const newsData = await NewsService.getById(slug)
 
-				if (foundNews) {
-					setNewsItem(foundNews)
+			if (newsData) {
+				setNewsItem(newsData)
 
-					// Get related news (same category, excluding current)
-					const related = response
-						.filter(
-							(news: any) =>
-								news.id !== foundNews.id && news.category === foundNews.category
-						)
-						.slice(0, 3)
-
-					setRelatedNews(related)
+				// Extract all image URLs from the images object
+				if (newsData.images) {
+					const urls = Object.values(newsData.images) as string[]
+					setImageUrls(urls)
+				} else if (newsData.image) {
+					setImageUrls([newsData.image])
 				} else {
-					// If not found in list, try direct fetch by ID
-					try {
-						const directResponse = await NewsService.getById(
-							Number(slug) || slug
-						)
-						if (directResponse) {
-							setNewsItem(directResponse)
+					setImageUrls(['/placeholder.svg'])
+				}
 
-							// Get some random news for related
-							const related = response.data
-								.filter((news: any) => news.id !== directResponse.id)
-								.slice(0, 3)
+				// Получаем связанные новости
+				try {
+					const response = await NewsService.getAll()
 
-							setRelatedNews(related)
-						} else {
-							setError(t.notFound)
-						}
-					} catch (err) {
-						console.error('Error fetching news by ID:', err)
-						setError(t.notFound)
+					if (response && response.data) {
+						// Фильтруем новости, исключая текущую и выбирая с той же категорией, если возможно
+						const related = response.data
+							.filter((news: any) => news.id !== newsData.id)
+							.slice(0, 3)
+
+						setRelatedNews(related)
 					}
+				} catch (err) {
+					console.error('Error fetching related news:', err)
+					// Не показываем ошибку пользователю, просто логируем
 				}
 			} else {
 				setError(t.notFound)
 			}
 		} catch (err) {
-			console.error('Error fetching news:', err)
+			console.error('Error fetching news by ID:', err)
 			setError(t.error)
 		} finally {
 			setLoading(false)
@@ -153,7 +158,7 @@ export default function NewsDetailPage() {
 		fetchNewsDetail()
 	}, [slug])
 
-	// Helper function to get image URL
+	// Helper function to get image URL for related news
 	const getImageUrl = (news: any) => {
 		if (news.images && Object.values(news.images)[0]) {
 			return Object.values(news.images)[0] as string
@@ -253,15 +258,65 @@ export default function NewsDetailPage() {
 					{/* Main content */}
 					<Grid size={8}>
 						<Paper elevation={0} sx={{ overflow: 'hidden', borderRadius: 2 }}>
-							<Box sx={{ position: 'relative', height: { xs: 300, md: 400 } }}>
-								<Image
-									src={getImageUrl(newsItem) || '/placeholder.svg'}
-									alt={newsItem.title}
-									fill
-									priority
-									style={{ objectFit: 'cover' }}
-								/>
+							{/* Image Slider */}
+							<Box sx={{ position: 'relative', width: '100%' }}>
+								{imageUrls.length > 1 ? (
+									<Box sx={{ maxWidth: '100%', flexGrow: 1 }}>
+										<Swiper
+											modules={[Navigation, Pagination, Autoplay]}
+											spaceBetween={0}
+											slidesPerView={1}
+											navigation
+											pagination={{ clickable: true }}
+											autoplay={{ delay: 5000, disableOnInteraction: false }}
+											loop={imageUrls.length > 1}
+											style={
+												{
+													width: '100%',
+													'--swiper-navigation-color': '#fff',
+													'--swiper-pagination-color': '#fff',
+													'--swiper-navigation-size': '24px',
+												} as React.CSSProperties
+											}
+										>
+											{imageUrls.map((imageUrl, index) => (
+												<SwiperSlide key={index}>
+													<Box
+														sx={{
+															position: 'relative',
+															height: { xs: 300, md: 400 },
+															width: '100%',
+														}}
+													>
+														<Image
+															src={imageUrl || '/placeholder.svg'}
+															alt={`${newsItem.title} - изображение ${
+																index + 1
+															}`}
+															fill
+															priority={index === 0}
+															style={{ objectFit: 'cover' }}
+														/>
+													</Box>
+												</SwiperSlide>
+											))}
+										</Swiper>
+									</Box>
+								) : (
+									<Box
+										sx={{ position: 'relative', height: { xs: 300, md: 400 } }}
+									>
+										<Image
+											src={imageUrls[0] || '/placeholder.svg'}
+											alt={newsItem.title}
+											fill
+											priority
+											style={{ objectFit: 'cover' }}
+										/>
+									</Box>
+								)}
 							</Box>
+
 							<Box sx={{ p: { xs: 3, md: 4 } }}>
 								<Typography
 									variant='h4'
@@ -331,8 +386,8 @@ export default function NewsDetailPage() {
 						</Typography>
 
 						<Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-							{relatedNews.length > 0 ? (
-								relatedNews.map(news => (
+							{relatedNews?.length ? (
+								relatedNews?.map(news => (
 									<Card
 										key={news.id}
 										sx={{ display: 'flex', flexDirection: 'column' }}

@@ -1,7 +1,9 @@
 'use client'
 
+import { AuthTokenService } from '@/src/service/auth-token.service'
+import { AuthService } from '@/src/service/auth.service'
 import { TeacherService } from '@/src/service/teacher.service'
-import type { Teacher } from '@/src/types'
+import type { User } from '@/src/types'
 import {
 	ArrowBack,
 	Cancel,
@@ -24,37 +26,30 @@ import {
 	CircularProgress,
 	Container,
 	Divider,
-	FormControl,
 	FormControlLabel,
 	Grid,
 	IconButton,
 	InputAdornment,
-	InputLabel,
 	LinearProgress,
-	MenuItem,
 	Paper,
-	Select,
 	Switch,
 	TextField,
 	Typography,
 } from '@mui/material'
 import Link from 'next/link'
-import { useParams, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import type React from 'react'
 import { useEffect, useState } from 'react'
 
-export default function EditTeacherPage() {
+export default function ProfileEditPage() {
 	const router = useRouter()
-	const params = useParams()
-	const teacherId = params.id as string
 
-	const [teacher, setTeacher] = useState<Teacher | null>(null)
+	const [user, setUser] = useState<User | null>(null)
 	const [fullName, setFullName] = useState('')
 	const [username, setUsername] = useState('')
 	const [changePassword, setChangePassword] = useState(false)
 	const [password, setPassword] = useState('')
 	const [showPassword, setShowPassword] = useState(false)
-	const [positionId, setPositionId] = useState<number>(1)
 	const [phoneNumber, setPhoneNumber] = useState('')
 	const [image, setImage] = useState<File | null>(null)
 	const [imagePreview, setImagePreview] = useState<string | null>(null)
@@ -64,51 +59,46 @@ export default function EditTeacherPage() {
 	const [fetchError, setFetchError] = useState<string | null>(null)
 	const [success, setSuccess] = useState(false)
 
-	const positions = [
-		{ id: 1, name: 'Преподаватель' },
-		{ id: 2, name: 'Доцент' },
-		{ id: 3, name: 'Профессор' },
-		{ id: 4, name: 'Заведующий кафедрой' },
-	]
-
 	useEffect(() => {
-		const fetchTeachers = async () => {
+		const fetchUserProfile = async () => {
 			try {
-				// Get all teachers
-				const { results } = await TeacherService.getAll()
+				// Check if user is authenticated
+				const isAuthenticated = AuthTokenService.isAuthenticated()
 
-				// Find the specific teacher by ID
-				const foundTeacher = results.find(t => t.id.toString() === teacherId)
-
-				if (!foundTeacher) {
-					throw new Error('Teacher not found')
+				if (!isAuthenticated) {
+					router.push('/auth')
+					return
 				}
 
-				console.log('Found teacher data:', foundTeacher)
-				setTeacher(foundTeacher)
+				// Get current user profile using getCurrentUser
+				const userData = await AuthService.getCurrentUser()
+
+				if (!userData) {
+					throw new Error('User not found')
+				}
+
+				console.log('Found user data:', userData)
+				setUser(userData)
 
 				// Set form values
-				setFullName(foundTeacher.full_name || '')
-				setUsername(foundTeacher.username || '')
-				setPositionId(foundTeacher.position_id || 1)
-				setPhoneNumber(foundTeacher.phone_number || '')
+				setFullName(userData.full_name || '')
+				setUsername(userData.username || '')
+				setPhoneNumber(userData.phone_number || '')
 
 				// Set image preview if available
-				if (foundTeacher.logo_teacher) {
-					setImagePreview(foundTeacher.logo_teacher)
+				if (userData.logo_teacher) {
+					setImagePreview(userData.logo_teacher)
 				}
 			} catch (err) {
-				console.error('Error finding teacher:', err)
-				setFetchError('Не удалось загрузить данные преподавателя')
+				console.error('Error finding user profile:', err)
+				setFetchError('Не удалось загрузить данные профиля')
 			} finally {
 				setLoadingData(false)
 			}
 		}
 
-		if (teacherId) {
-			fetchTeachers()
-		}
-	}, [teacherId])
+		fetchUserProfile()
+	}, [router])
 
 	const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files[0]) {
@@ -147,8 +137,6 @@ export default function EditTeacherPage() {
 			const formData = new FormData()
 			formData.append('full_name', fullName)
 			formData.append('username', username)
-			formData.append('position_id', positionId.toString())
-			formData.append('role', 'teacher')
 
 			if (changePassword && password) {
 				formData.append('password', password)
@@ -162,20 +150,18 @@ export default function EditTeacherPage() {
 				formData.append('logo_teacher', image)
 			}
 
-			console.log('Submitting teacher data:', Object.fromEntries(formData))
-			await TeacherService.update(teacherId, formData)
+			console.log('Submitting profile data:', Object.fromEntries(formData))
+			await TeacherService.update(user?.id as string, formData)
 
 			setSuccess(true)
 
 			// Redirect after short delay
 			setTimeout(() => {
-				router.push('/admin/teachers')
+				router.push('/profile')
 			}, 2000)
 		} catch (err) {
-			console.error('Error updating teacher:', err)
-			setError(
-				'Ошибка при обновлении преподавателя. Пожалуйста, попробуйте позже.'
-			)
+			console.error('Error updating profile:', err)
+			setError('Ошибка при обновлении профиля. Пожалуйста, попробуйте позже.')
 		} finally {
 			setLoading(false)
 		}
@@ -194,9 +180,7 @@ export default function EditTeacherPage() {
 						>
 							<CircularProgress />
 						</Box>
-						<Typography align='center'>
-							Загрузка данных преподавателя...
-						</Typography>
+						<Typography align='center'>Загрузка данных профиля...</Typography>
 					</Paper>
 				</Box>
 			</Container>
@@ -214,9 +198,9 @@ export default function EditTeacherPage() {
 						<Button
 							variant='contained'
 							startIcon={<ArrowBack />}
-							onClick={() => router.push('/admin/teachers')}
+							onClick={() => router.push('/profile')}
 						>
-							Вернуться к списку преподавателей
+							Вернуться к профилю
 						</Button>
 					</Paper>
 				</Box>
@@ -225,29 +209,8 @@ export default function EditTeacherPage() {
 	}
 
 	return (
-		<Container maxWidth='xl'>
+		<Container maxWidth='lg'>
 			<Box sx={{ mb: 3 }}>
-				<Breadcrumbs
-					separator={<NavigateNext fontSize='small' />}
-					sx={{ mb: 1 }}
-				>
-					<Link
-						href='/admin'
-						style={{ textDecoration: 'none', color: 'inherit' }}
-					>
-						Главная
-					</Link>
-					<Link
-						href='/admin/teachers'
-						style={{ textDecoration: 'none', color: 'inherit' }}
-					>
-						Преподаватели
-					</Link>
-					<Typography color='text.primary'>
-						Редактирование преподавателя
-					</Typography>
-				</Breadcrumbs>
-
 				<Box
 					sx={{
 						display: 'flex',
@@ -260,16 +223,31 @@ export default function EditTeacherPage() {
 						component='h1'
 						sx={{ fontWeight: 700, color: 'primary.main' }}
 					>
-						Редактирование преподавателя
+						Редактирование профиля
 					</Typography>
 					<Button
 						variant='outlined'
 						startIcon={<ArrowBack />}
-						onClick={() => router.push('/admin/teachers')}
+						onClick={() => router.push('/profile')}
 					>
-						Назад к списку
+						Назад к профилю
 					</Button>
 				</Box>
+				<Breadcrumbs
+					separator={<NavigateNext fontSize='small' />}
+					sx={{ mb: 1 }}
+				>
+					<Link href='/' style={{ textDecoration: 'none', color: 'inherit' }}>
+						Главная
+					</Link>
+					<Link
+						href='/profile'
+						style={{ textDecoration: 'none', color: 'inherit' }}
+					>
+						Профиль
+					</Link>
+					<Typography color='text.primary'>Редактирование профиля</Typography>
+				</Breadcrumbs>
 			</Box>
 
 			{error && (
@@ -280,7 +258,7 @@ export default function EditTeacherPage() {
 
 			{success && (
 				<Alert severity='success' sx={{ mb: 3 }}>
-					Преподаватель успешно обновлен!
+					Профиль успешно обновлен!
 				</Alert>
 			)}
 
@@ -363,22 +341,6 @@ export default function EditTeacherPage() {
 										/>
 									)}
 
-									<FormControl fullWidth sx={{ mb: 2 }}>
-										<InputLabel>Должность</InputLabel>
-										<Select
-											value={positionId}
-											label='Должность'
-											onChange={e => setPositionId(e.target.value as number)}
-											disabled={loading}
-										>
-											{positions.map(position => (
-												<MenuItem key={position.id} value={position.id}>
-													{position.name}
-												</MenuItem>
-											))}
-										</Select>
-									</FormControl>
-
 									<TextField
 										label='Номер телефона'
 										fullWidth
@@ -416,10 +378,11 @@ export default function EditTeacherPage() {
 									>
 										<Avatar
 											src={
-												`http://di-nmtu.social/${imagePreview}` ||
-												'/default-avatar.png'
+												imagePreview
+													? `http://di-nmtu.social${imagePreview}`
+													: '/default-avatar.png'
 											}
-											alt='Teacher preview'
+											alt='User preview'
 											sx={{ width: 150, height: 150, mb: 2 }}
 										/>
 
@@ -455,7 +418,7 @@ export default function EditTeacherPage() {
 					<Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
 						<Button
 							variant='outlined'
-							onClick={() => router.push('/admin/teachers')}
+							onClick={() => router.push('/profile')}
 							disabled={loading}
 							startIcon={<Cancel />}
 						>

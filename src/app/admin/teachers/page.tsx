@@ -10,7 +10,6 @@ import {
 	Edit as EditIcon,
 	NavigateNext,
 	Search as SearchIcon,
-	Visibility as VisibilityIcon,
 } from '@mui/icons-material'
 import {
 	Alert,
@@ -255,7 +254,7 @@ export default function TeachersPage() {
 								<TableRow key={item.id}>
 									<TableCell>
 										<Avatar
-											src={getTeacherImage(item)}
+											src={`http://di-nmtu.social/${getTeacherImage(item)}`}
 											alt={getTeacherFullName(item)}
 											sx={{ width: 50, height: 50 }}
 										/>
@@ -264,12 +263,6 @@ export default function TeachersPage() {
 									<TableCell>{getTeacherPosition(item)}</TableCell>
 									<TableCell>{item.username || '—'}</TableCell>
 									<TableCell align='right'>
-										<IconButton
-											color='info'
-											onClick={() => handleViewTeacher(item.id)}
-										>
-											<VisibilityIcon />
-										</IconButton>
 										<IconButton
 											color='primary'
 											onClick={() => handleEditTeacher(item.id)}

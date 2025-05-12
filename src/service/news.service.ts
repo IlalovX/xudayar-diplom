@@ -1,5 +1,6 @@
 import { showApiError } from '@/src/api/error'
 import { axiosInstance } from '@/src/api/interceptors'
+import axios from 'axios'
 
 export const NewsService = {
 	async getAll(params?: { limit?: number; page?: number }) {
@@ -7,6 +8,7 @@ export const NewsService = {
 			const { data } = await axiosInstance.get('/api/v1/announcement/news/', {
 				params,
 			})
+
 			return data
 		} catch (error) {
 			showApiError(error)
@@ -38,8 +40,14 @@ export const NewsService = {
 		}
 	},
 
-	async create(newsData: FormData) {
+	async create(newsData: {
+		title: string
+		text: string
+		images: Record<string, string>
+	}) {
 		try {
+			console.log(newsData)
+
 			const { data } = await axiosInstance.post(
 				'/api/v1/announcement/news/',
 				newsData
@@ -54,9 +62,10 @@ export const NewsService = {
 	async uploadImage(imageFile: File) {
 		try {
 			const formData = new FormData()
+
 			formData.append('image', imageFile)
-			const { data } = await axiosInstance.post(
-				'/api/v1/announcement/image/',
+			const { data } = await axios.post(
+				'http://di-nmtu.social/api/v1/announcement/image/',
 				formData
 			)
 			return data

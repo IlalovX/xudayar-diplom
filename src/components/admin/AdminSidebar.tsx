@@ -74,7 +74,7 @@ export default function AdminSidebar() {
 					justifyContent: 'center',
 				}}
 			>
-				<Image src='/logo.png' alt='Логотип' width={40} height={40} />
+				<Image src='/logo.svg' alt='Логотип' width={40} height={40} />
 				<Typography variant='h6' sx={{ ml: 1, fontWeight: 700 }}>
 					Админ панель
 				</Typography>

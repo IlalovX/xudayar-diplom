@@ -2,10 +2,12 @@
 
 import { AuthTokenService } from '@/src/service/auth-token.service'
 import { AuthService } from '@/src/service/auth.service'
+import { NavigateNext } from '@mui/icons-material'
 import {
 	Alert,
 	Avatar,
 	Box,
+	Breadcrumbs,
 	Button,
 	CircularProgress,
 	Container,
@@ -14,6 +16,7 @@ import {
 	Paper,
 	Typography,
 } from '@mui/material'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -103,6 +106,13 @@ export default function ProfilePage() {
 			>
 				Личный кабинет преподавателя
 			</Typography>
+			<Breadcrumbs separator={<NavigateNext fontSize='small' />} sx={{ mb: 1 }}>
+				<Link href='/' style={{ textDecoration: 'none', color: 'inherit' }}>
+					Главная
+				</Link>
+
+				<Typography color='text.primary'>Профиль</Typography>
+			</Breadcrumbs>
 
 			<Grid container spacing={4}>
 				<Grid size={4}>

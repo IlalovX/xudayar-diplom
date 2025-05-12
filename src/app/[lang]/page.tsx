@@ -46,6 +46,7 @@ export default function HomePage({ params: paramsPromise }: HomePageProps) {
 			try {
 				setIsLoading(true)
 				const news = await NewsService.getAll()
+
 				setNewsItems(news)
 				setError(null)
 			} catch (err) {
@@ -96,13 +97,17 @@ export default function HomePage({ params: paramsPromise }: HomePageProps) {
 		{
 			id: 2,
 			title: 'Стипендии и гранты',
-			icon: <EmojiEvents sx={{ color: 'black', width: '40px', height: '40px' }} />,
+			icon: (
+				<EmojiEvents sx={{ color: 'black', width: '40px', height: '40px' }} />
+			),
 			link: `/${lang}/scholarships`,
 		},
 		{
 			id: 3,
 			title: 'Научные проекты',
-			icon: <Psychology sx={{ color: 'black', width: '40px', height: '40px' }} />,
+			icon: (
+				<Psychology sx={{ color: 'black', width: '40px', height: '40px' }} />
+			),
 			link: `/${lang}/research`,
 		},
 		{
@@ -125,10 +130,18 @@ export default function HomePage({ params: paramsPromise }: HomePageProps) {
 		},
 	]
 
-	const getImageUrl = (news: any) =>
-		news.image?.startsWith('http')
-			? news.image
-			: news.image || '/placeholder.svg'
+	const getImageUrl = (news: any) => {
+		// Проверяем, если изображения есть
+		if (news.images && Object.keys(news.images).length > 0) {
+			// Получаем первое изображение из объекта
+			const firstImageKey = Object.keys(news.images)[0]
+			console.log(news.images[firstImageKey])
+
+			return news.images[firstImageKey] || '/placeholder.svg' // Возвращаем URL изображения или заглушку
+		}
+
+		return '/placeholder.svg'
+	}
 
 	const getNewsSlug = (news: any) => news.slug || `${news.id}`
 
@@ -293,7 +306,7 @@ export default function HomePage({ params: paramsPromise }: HomePageProps) {
 									<CardMedia
 										component='img'
 										height='300'
-										image={getImageUrl(newsItems[0])}
+										image={newsItems && getImageUrl(newsItems[0])}
 										alt={newsItems[0].title}
 									/>
 									<CardContent sx={{ flexGrow: 1 }}>

@@ -66,12 +66,7 @@ export const TeacherService = {
 		try {
 			const { data } = await axiosInstance.put(
 				`/api/v1/teachers/put/teacher/${id}/`,
-				teacherData,
-				{
-					headers: {
-						'Content-Type': 'multipart/form-data',
-					},
-				}
+				teacherData
 			)
 			return data
 		} catch (error) {

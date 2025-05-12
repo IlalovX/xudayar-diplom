@@ -95,7 +95,7 @@ export const DocumentsService = {
 		}
 	},
 
-	async delete(id: number) {
+	async delete(id: string) {
 		try {
 			await axiosInstance.delete(`/api/v1/documents/document/${id}/`)
 			return true
