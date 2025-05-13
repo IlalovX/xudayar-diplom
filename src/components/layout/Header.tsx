@@ -226,7 +226,6 @@ const Header = ({ transparent = false }: HeaderProps) => {
 						>
 							Новости
 						</Button>
-z
 						<Button
 							component={Link}
 							href={`/${language}/about`}
