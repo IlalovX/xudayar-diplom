@@ -22,22 +22,27 @@ const Footer = ({ lang }: FooterProps) => {
 				<Grid container spacing={4}>
 					<Grid size={4}>
 						<Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-							<Image src='/logo.svg' alt='ДИ кафедра' width={40} height={40} />
+							<Image
+								src='/logo.svg'
+								alt='SE Department'
+								width={40}
+								height={40}
+							/>
 							<Typography variant='h6' sx={{ ml: 1, fontWeight: 700 }}>
-								ДИ кафедра
+							SE Department
 							</Typography>
 						</Box>
 						<Typography variant='body2' sx={{ mb: 2 }}>
-							Официальный сайт ДИ кафедра
+							Official website of the SE Department
 						</Typography>
-						<Typography variant='body2'>Адрес: г. Нукус</Typography>
-						<Typography variant='body2'>Телефон: +998 71 123-45-67</Typography>
+						<Typography variant='body2'>Address: Nukus city</Typography>
+						<Typography variant='body2'>Phone: +998 71 123-45-67</Typography>
 						<Typography variant='body2'>Email: nukusstu@edu.uz</Typography>
 					</Grid>
 
 					<Grid size={4}>
 						<Typography variant='h6' sx={{ mb: 2, fontWeight: 700 }}>
-							Полезные ссылки
+							Useful Links
 						</Typography>
 						<MuiLink
 							component={Link}
@@ -46,7 +51,7 @@ const Footer = ({ lang }: FooterProps) => {
 							underline='hover'
 							sx={{ display: 'block', mb: 1 }}
 						>
-							Документы
+							Documents
 						</MuiLink>
 						<MuiLink
 							component={Link}
@@ -55,7 +60,7 @@ const Footer = ({ lang }: FooterProps) => {
 							underline='hover'
 							sx={{ display: 'block', mb: 1 }}
 						>
-							Новости
+							News
 						</MuiLink>
 						<MuiLink
 							component={Link}
@@ -64,7 +69,7 @@ const Footer = ({ lang }: FooterProps) => {
 							underline='hover'
 							sx={{ display: 'block', mb: 1 }}
 						>
-							Преподаватели
+							Teachers
 						</MuiLink>
 						<MuiLink
 							component={Link}
@@ -73,13 +78,13 @@ const Footer = ({ lang }: FooterProps) => {
 							underline='hover'
 							sx={{ display: 'block', mb: 1 }}
 						>
-							О нас
+							About Us
 						</MuiLink>
 					</Grid>
 
 					<Grid size={4}>
 						<Typography variant='h6' sx={{ mb: 2, fontWeight: 700 }}>
-							Государственные ресурсы
+							Government Resources
 						</Typography>
 						<MuiLink
 							href='https://president.uz'
@@ -89,7 +94,7 @@ const Footer = ({ lang }: FooterProps) => {
 							underline='hover'
 							sx={{ display: 'block', mb: 1 }}
 						>
-							Президент Республики Узбекистан
+							President of the Republic of Uzbekistan
 						</MuiLink>
 						<MuiLink
 							href='https://gov.uz'
@@ -99,7 +104,7 @@ const Footer = ({ lang }: FooterProps) => {
 							underline='hover'
 							sx={{ display: 'block', mb: 1 }}
 						>
-							Правительственный портал
+							Government Portal
 						</MuiLink>
 						<MuiLink
 							href='https://my.gov.uz'
@@ -109,7 +114,7 @@ const Footer = ({ lang }: FooterProps) => {
 							underline='hover'
 							sx={{ display: 'block', mb: 1 }}
 						>
-							Единый портал интерактивных государственных услуг
+							Unified Portal of Interactive Public Services
 						</MuiLink>
 						<MuiLink
 							href='https://data.gov.uz'
@@ -119,7 +124,7 @@ const Footer = ({ lang }: FooterProps) => {
 							underline='hover'
 							sx={{ display: 'block', mb: 1 }}
 						>
-							Портал открытых данных
+							Open Data Portal
 						</MuiLink>
 					</Grid>
 				</Grid>
@@ -135,15 +140,15 @@ const Footer = ({ lang }: FooterProps) => {
 					}}
 				>
 					<Typography variant='body2' sx={{ mb: { xs: 2, sm: 0 } }}>
-						© {currentYear} Министерство Высшего Образования Республики
-						Узбекистан. Все права защищены.
+						© {currentYear} Ministry of Higher Education of the Republic of
+						Uzbekistan. All rights reserved.
 					</Typography>
 					<Box sx={{ display: 'flex', gap: 2 }}>
 						<MuiLink href='/privacy-policy' color='inherit' underline='hover'>
-							Политика конфиденциальности
+							Privacy Policy
 						</MuiLink>
 						<MuiLink href='/terms-of-use' color='inherit' underline='hover'>
-							Условия использования
+							Terms of Use
 						</MuiLink>
 					</Box>
 				</Box>

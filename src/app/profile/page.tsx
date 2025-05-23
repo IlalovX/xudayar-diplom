@@ -56,7 +56,7 @@ export default function ProfilePage() {
 				const userData = await AuthService.getCurrentUser()
 				setUser(userData)
 			} catch (err) {
-				setError('Не удалось загрузить данные пользователя')
+				setError('Failed to load user data')
 			} finally {
 				setIsLoading(false)
 			}
@@ -90,7 +90,7 @@ export default function ProfilePage() {
 			<Container maxWidth='md' sx={{ py: 4 }}>
 				<Alert severity='error'>{error}</Alert>
 				<Button variant='contained' onClick={handleLogout} sx={{ mt: 2 }}>
-					Выйти
+					Log out
 				</Button>
 			</Container>
 		)
@@ -104,14 +104,13 @@ export default function ProfilePage() {
 				gutterBottom
 				sx={{ color: 'primary.main', fontWeight: 700 }}
 			>
-				Личный кабинет преподавателя
+				Teacher's Profile
 			</Typography>
 			<Breadcrumbs separator={<NavigateNext fontSize='small' />} sx={{ mb: 1 }}>
 				<Link href='/' style={{ textDecoration: 'none', color: 'inherit' }}>
-					Главная
+					Home
 				</Link>
-
-				<Typography color='text.primary'>Профиль</Typography>
+				<Typography color='text.primary'>Profile</Typography>
 			</Breadcrumbs>
 
 			<Grid container spacing={4}>
@@ -126,14 +125,14 @@ export default function ProfilePage() {
 						>
 							<Avatar
 								src={user?.logo_teacher || '/default-avatar.png'}
-								alt={user?.full_name || 'Пользователь'}
+								alt={user?.full_name || 'User'}
 								sx={{ width: 120, height: 120, mb: 2 }}
 							/>
 							<Typography variant='h5' component='h2' gutterBottom>
-								{user?.full_name || 'Имя не указано'}
+								{user?.full_name || 'Name not specified'}
 							</Typography>
 							<Typography variant='body1' color='text.secondary' gutterBottom>
-								Преподаватель
+								Teacher
 							</Typography>
 							<Button
 								variant='outlined'
@@ -141,7 +140,7 @@ export default function ProfilePage() {
 								sx={{ mt: 2 }}
 								onClick={() => router.push('/profile/edit')}
 							>
-								Редактировать профиль
+								Edit profile
 							</Button>
 							<Button
 								variant='contained'
@@ -150,7 +149,7 @@ export default function ProfilePage() {
 								sx={{ mt: 2 }}
 								onClick={handleLogout}
 							>
-								Выйти
+								Log out
 							</Button>
 						</Box>
 					</Paper>
@@ -159,41 +158,41 @@ export default function ProfilePage() {
 				<Grid size={10}>
 					<Paper elevation={2} sx={{ p: 3 }}>
 						<Typography variant='h6' component='h3' gutterBottom>
-							Информация о пользователе
+							User Information
 						</Typography>
 						<Divider sx={{ mb: 2 }} />
 
 						<Grid container spacing={2}>
 							<Grid size={6}>
 								<Typography variant='body2' color='text.secondary'>
-									Имя пользователя:
+									Username:
 								</Typography>
 							</Grid>
 							<Grid size={6}>
 								<Typography variant='body1'>
-									{user?.username || 'Не указано'}
+									{user?.username || 'Not specified'}
 								</Typography>
 							</Grid>
 
 							<Grid size={6}>
 								<Typography variant='body2' color='text.secondary'>
-									Номер телефона:
+									Phone number:
 								</Typography>
 							</Grid>
 							<Grid size={6}>
 								<Typography variant='body1'>
-									{user?.phone_number || 'Не указано'}
+									{user?.phone_number || 'Not specified'}
 								</Typography>
 							</Grid>
 
 							<Grid size={6}>
 								<Typography variant='body2' color='text.secondary'>
-									Роль:
+									Role:
 								</Typography>
 							</Grid>
 							<Grid size={6}>
 								<Typography variant='body1'>
-									{user?.role === 'teacher' ? 'Преподаватель' : 'Пользователь'}
+									{user?.role === 'teacher' ? 'Teacher' : 'User'}
 								</Typography>
 							</Grid>
 						</Grid>
@@ -201,7 +200,7 @@ export default function ProfilePage() {
 
 					<Paper elevation={2} sx={{ p: 3, mt: 3 }}>
 						<Typography variant='h6' component='h3' gutterBottom>
-							Мои документы
+							My Documents
 						</Typography>
 						<Divider sx={{ mb: 2 }} />
 
@@ -210,12 +209,12 @@ export default function ProfilePage() {
 							onClick={() => router.push('/profile/docs')}
 							sx={{ mb: 2 }}
 						>
-							Управление документами
+							Manage Documents
 						</Button>
 
 						<Typography variant='body2' color='text.secondary'>
-							В этом разделе вы можете управлять своими документами, загружать
-							новые и редактировать существующие.
+							In this section, you can manage your documents, upload new ones,
+							and edit existing ones.
 						</Typography>
 					</Paper>
 				</Grid>

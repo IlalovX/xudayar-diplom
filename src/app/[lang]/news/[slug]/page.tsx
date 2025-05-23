@@ -330,9 +330,7 @@ export default function NewsDetailPage() {
 								<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 3 }}>
 									<Chip
 										icon={<CalendarIcon />}
-										label={new Date(
-											newsItem.date || newsItem.createdAt
-										).toLocaleDateString()}
+										label={newsItem.created_date}
 										variant='outlined'
 										size='small'
 									/>
@@ -415,9 +413,7 @@ export default function NewsDetailPage() {
 												color='text.secondary'
 												sx={{ mb: 2 }}
 											>
-												{new Date(
-													news.date || news.createdAt
-												).toLocaleDateString()}
+												{news.created_date}
 											</Typography>
 											<Button
 												component={Link}

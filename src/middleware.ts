@@ -3,7 +3,7 @@ import Negotiator from 'negotiator'
 import { type NextRequest, NextResponse } from 'next/server'
 
 const locales = ['uz', 'ru', 'en']
-export const defaultLocale = 'uz'
+export const defaultLocale = 'en'
 
 // Get the preferred locale from request headers
 function getLocale(request: NextRequest): string {

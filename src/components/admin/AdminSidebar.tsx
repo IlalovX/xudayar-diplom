@@ -73,10 +73,11 @@ export default function AdminSidebar() {
 					alignItems: 'center',
 					justifyContent: 'center',
 				}}
+				onClick={() => handleNavigation('/')}
 			>
-				<Image src='/logo.svg' alt='Логотип' width={40} height={40} />
+				<Image src='/logo.svg' alt='Logo' width={40} height={40} />
 				<Typography variant='h6' sx={{ ml: 1, fontWeight: 700 }}>
-					Админ панель
+					Admin Panel
 				</Typography>
 			</Box>
 			<Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }} />
@@ -102,7 +103,7 @@ export default function AdminSidebar() {
 						<ListItemIcon sx={{ color: 'white' }}>
 							<DashboardIcon />
 						</ListItemIcon>
-						<ListItemText primary='Панель управления' />
+						<ListItemText primary='Dashboard' />
 					</ListItemButton>
 				</ListItem>
 
@@ -127,7 +128,7 @@ export default function AdminSidebar() {
 						<ListItemIcon sx={{ color: 'white' }}>
 							<ArticleIcon />
 						</ListItemIcon>
-						<ListItemText primary='Новости' />
+						<ListItemText primary='News' />
 					</ListItemButton>
 				</ListItem>
 
@@ -145,7 +146,7 @@ export default function AdminSidebar() {
 						<ListItemIcon sx={{ color: 'white' }}>
 							<DescriptionIcon />
 						</ListItemIcon>
-						<ListItemText primary='Документы' />
+						<ListItemText primary='Documents' />
 						{openDocuments ? <ExpandLess /> : <ExpandMore />}
 					</ListItemButton>
 				</ListItem>
@@ -173,7 +174,7 @@ export default function AdminSidebar() {
 								<ListItemIcon sx={{ color: 'white' }}>
 									<DescriptionIcon />
 								</ListItemIcon>
-								<ListItemText primary='Все документы' />
+								<ListItemText primary='All Documents' />
 							</ListItemButton>
 						</ListItem>
 						<ListItem disablePadding>
@@ -198,7 +199,7 @@ export default function AdminSidebar() {
 								<ListItemIcon sx={{ color: 'white' }}>
 									<CategoryIcon />
 								</ListItemIcon>
-								<ListItemText primary='Категории' />
+								<ListItemText primary='Categories' />
 							</ListItemButton>
 						</ListItem>
 						<ListItem disablePadding>
@@ -223,7 +224,7 @@ export default function AdminSidebar() {
 								<ListItemIcon sx={{ color: 'white' }}>
 									<CalendarIcon />
 								</ListItemIcon>
-								<ListItemText primary='Учебные годы' />
+								<ListItemText primary='Academic Years' />
 							</ListItemButton>
 						</ListItem>
 					</List>
@@ -250,7 +251,7 @@ export default function AdminSidebar() {
 						<ListItemIcon sx={{ color: 'white' }}>
 							<PeopleIcon />
 						</ListItemIcon>
-						<ListItemText primary='Преподаватели' />
+						<ListItemText primary='Teachers' />
 					</ListItemButton>
 				</ListItem>
 
@@ -275,7 +276,7 @@ export default function AdminSidebar() {
 						<ListItemIcon sx={{ color: 'white' }}>
 							<SchoolIcon />
 						</ListItemIcon>
-						<ListItemText primary='Образование' />
+						<ListItemText primary='Education' />
 					</ListItemButton>
 				</ListItem>
 
@@ -302,7 +303,7 @@ export default function AdminSidebar() {
 						<ListItemIcon sx={{ color: 'white' }}>
 							<SettingsIcon />
 						</ListItemIcon>
-						<ListItemText primary='Настройки' />
+						<ListItemText primary='Settings' />
 					</ListItemButton>
 				</ListItem>
 
@@ -320,7 +321,7 @@ export default function AdminSidebar() {
 						<ListItemIcon sx={{ color: 'white' }}>
 							<LogoutIcon />
 						</ListItemIcon>
-						<ListItemText primary='Выйти' />
+						<ListItemText primary='Logout' />
 					</ListItemButton>
 				</ListItem>
 			</List>

@@ -67,14 +67,13 @@ export default function AdminDashboard() {
 		router.push(path)
 	}
 
-	// Mock data for statistics
 	const statistics = {
 		newsCount: newsCount,
 		documentsCount: documentsCount,
 		teachersCount: teachersCount,
-		visitorsToday: 245,
-		visitorsWeek: 1876,
-		visitorsMonth: 8432,
+		visitorsToday: 0,
+		visitorsWeek: 0,
+		visitorsMonth: 0,
 	}
 
 	return (
@@ -85,7 +84,7 @@ export default function AdminDashboard() {
 				gutterBottom
 				sx={{ fontWeight: 700, color: 'primary.main', mb: 4 }}
 			>
-				Панель управления
+				Admin Panel
 			</Typography>
 
 			{/* Statistics Cards */}
@@ -120,7 +119,7 @@ export default function AdminDashboard() {
 							<ArticleIcon sx={{ fontSize: 40, color: '#0D47A1' }} />
 						</Box>
 						<Typography variant='h6' component='h2' gutterBottom>
-							Новости
+							News
 						</Typography>
 						<Typography
 							variant='h3'
@@ -161,7 +160,7 @@ export default function AdminDashboard() {
 							<DescriptionIcon sx={{ fontSize: 40, color: '#2E7D32' }} />
 						</Box>
 						<Typography variant='h6' component='h2' gutterBottom>
-							Документы
+							Documents
 						</Typography>
 						<Typography
 							variant='h3'
@@ -202,7 +201,7 @@ export default function AdminDashboard() {
 							<PeopleIcon sx={{ fontSize: 40, color: '#FF8F00' }} />
 						</Box>
 						<Typography variant='h6' component='h2' gutterBottom>
-							Преподаватели
+							Teachers
 						</Typography>
 						<Typography
 							variant='h3'
@@ -243,7 +242,7 @@ export default function AdminDashboard() {
 							<SchoolIcon sx={{ fontSize: 40, color: '#6A1B9A' }} />
 						</Box>
 						<Typography variant='h6' component='h2' gutterBottom>
-							Посетители сегодня
+							Visitors Today
 						</Typography>
 						<Typography
 							variant='h3'
@@ -261,13 +260,13 @@ export default function AdminDashboard() {
 				<Grid size={6}>
 					<Card elevation={2}>
 						<CardHeader
-							title='Последние новости'
+							title='Recent News'
 							action={
 								<Button
 									color='primary'
 									onClick={() => handleNavigate('/admin/news')}
 								>
-									Все новости
+									View All
 								</Button>
 							}
 						/>
@@ -321,7 +320,7 @@ export default function AdminDashboard() {
 									))
 								) : (
 									<ListItem>
-										<ListItemText primary='Нет новостей' />
+										<ListItemText primary='No news available' />
 									</ListItem>
 								)}
 							</List>
@@ -332,7 +331,7 @@ export default function AdminDashboard() {
 				{/* Quick Actions */}
 				<Grid size={6}>
 					<Card elevation={2} sx={{ mb: 3 }}>
-						<CardHeader title='Быстрые действия' />
+						<CardHeader title='Quick Actions' />
 						<Divider />
 						<CardContent>
 							<Grid container spacing={2}>
@@ -342,9 +341,9 @@ export default function AdminDashboard() {
 										fullWidth
 										startIcon={<ArticleIcon />}
 										onClick={() => handleNavigate('/admin/news/create')}
-										sx={{ py: 1.5 }}
+										sx={{ py: 1.5, height: 1 }}
 									>
-										Добавить новость
+										Add News
 									</Button>
 								</Grid>
 								<Grid size={3}>
@@ -355,7 +354,7 @@ export default function AdminDashboard() {
 										onClick={() => handleNavigate('/admin/documents/create')}
 										sx={{ py: 1.5 }}
 									>
-										Добавить документ
+										Add Document
 									</Button>
 								</Grid>
 								<Grid size={3}>
@@ -364,9 +363,9 @@ export default function AdminDashboard() {
 										fullWidth
 										startIcon={<PeopleIcon />}
 										onClick={() => handleNavigate('/admin/teachers/create')}
-										sx={{ py: 1.5 }}
+										sx={{ py: 1.5, height: 1 }}
 									>
-										Добавить преподавателя
+										Add Teacher
 									</Button>
 								</Grid>
 								<Grid size={3}>
@@ -377,7 +376,7 @@ export default function AdminDashboard() {
 										onClick={() => handleNavigate('/admin/education')}
 										sx={{ py: 1.5 }}
 									>
-										Управление образованием
+										Manage Education
 									</Button>
 								</Grid>
 							</Grid>
@@ -386,7 +385,7 @@ export default function AdminDashboard() {
 
 					{/* Visitors Statistics */}
 					<Card elevation={2}>
-						<CardHeader title='Статистика посещений' />
+						<CardHeader title='Visitor Statistics' />
 						<Divider />
 						<CardContent>
 							<Grid container spacing={2}>
@@ -400,7 +399,7 @@ export default function AdminDashboard() {
 											{statistics.visitorsToday}
 										</Typography>
 										<Typography variant='body2' color='text.secondary'>
-											Сегодня
+											Today
 										</Typography>
 									</Box>
 								</Grid>
@@ -414,7 +413,7 @@ export default function AdminDashboard() {
 											{statistics.visitorsWeek}
 										</Typography>
 										<Typography variant='body2' color='text.secondary'>
-											За неделю
+											This Week
 										</Typography>
 									</Box>
 								</Grid>
@@ -428,7 +427,7 @@ export default function AdminDashboard() {
 											{statistics.visitorsMonth}
 										</Typography>
 										<Typography variant='body2' color='text.secondary'>
-											За месяц
+											This Month
 										</Typography>
 									</Box>
 								</Grid>

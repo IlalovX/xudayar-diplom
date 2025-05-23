@@ -1,7 +1,5 @@
 'use client'
 
-import type React from 'react'
-
 import { AuthTokenService } from '@/src/service/auth-token.service'
 import { Menu as MenuIcon, Person } from '@mui/icons-material'
 import {
@@ -19,6 +17,7 @@ import {
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import type React from 'react'
 import { useEffect, useState } from 'react'
 
 interface HeaderProps {
@@ -34,17 +33,14 @@ const Header = ({ transparent = false }: HeaderProps) => {
 	const pathname = usePathname()
 
 	useEffect(() => {
-		// Check authentication status on client side
 		const checkAuth = () => {
 			const isAuth = AuthTokenService.isAuthenticated()
 			const role = AuthTokenService.getUserRole()
 			setIsAuthenticated(isAuth)
 			setUserRole(role)
 		}
-
 		checkAuth()
 
-		// Extract language from URL if it exists
 		const pathParts = pathname?.split('/') || []
 		if (pathParts[1] && ['uz', 'ru', 'en'].includes(pathParts[1])) {
 			setLanguage(pathParts[1])
@@ -63,7 +59,6 @@ const Header = ({ transparent = false }: HeaderProps) => {
 		const newLang = event.target.value
 		setLanguage(newLang)
 
-		// Update URL with new language
 		if (pathname) {
 			const pathParts = pathname.split('/')
 			if (['uz', 'ru', 'en'].includes(pathParts[1])) {
@@ -92,19 +87,17 @@ const Header = ({ transparent = false }: HeaderProps) => {
 			position='static'
 			color={transparent ? 'transparent' : 'primary'}
 			elevation={transparent ? 0 : 4}
-			sx={{
-				backgroundColor: transparent ? 'transparent' : '#0D47A1',
-			}}
+			sx={{ backgroundColor: transparent ? 'transparent' : '#0D47A1' }}
 		>
 			<Container maxWidth='xl'>
 				<Toolbar disableGutters>
-					{/* Logo for desktop */}
+					{/* Logo desktop */}
 					<Box sx={{ display: { xs: 'none', md: 'flex' }, mr: 2 }}>
 						<Link href={`/${language}`}>
 							<Box sx={{ display: 'flex', alignItems: 'center' }}>
 								<Image
 									src='/logo.svg'
-									alt='Министерство Высшего Образования'
+									alt='Ministry of Higher Education'
 									width={80}
 									height={80}
 								/>
@@ -118,7 +111,7 @@ const Header = ({ transparent = false }: HeaderProps) => {
 										textDecoration: 'none',
 									}}
 								>
-									ДИ кафедра
+									SE Department
 								</Typography>
 							</Box>
 						</Link>
@@ -149,30 +142,27 @@ const Header = ({ transparent = false }: HeaderProps) => {
 							}}
 							open={Boolean(anchorElNav)}
 							onClose={handleCloseNavMenu}
-							sx={{
-								display: { xs: 'block', md: 'none' },
-							}}
+							sx={{ display: { xs: 'block', md: 'none' } }}
 						>
 							<MenuItem onClick={handleCloseNavMenu}>
 								<Link href={`/${language}`}>
-									<Typography textAlign='center'>Главная</Typography>
+									<Typography textAlign='center'>Home</Typography>
 								</Link>
 							</MenuItem>
 							<MenuItem onClick={handleCloseNavMenu}>
 								<Link href={`/${language}/news`}>
-									<Typography textAlign='center'>Новости</Typography>
+									<Typography textAlign='center'>News</Typography>
 								</Link>
 							</MenuItem>
-
 							<MenuItem onClick={handleCloseNavMenu}>
 								<Link href={`/${language}/about`}>
-									<Typography textAlign='center'>О нас</Typography>
+									<Typography textAlign='center'>About us</Typography>
 								</Link>
 							</MenuItem>
 						</Menu>
 					</Box>
 
-					{/* Logo for mobile */}
+					{/* Logo mobile */}
 					<Box
 						sx={{
 							flexGrow: 1,
@@ -184,7 +174,7 @@ const Header = ({ transparent = false }: HeaderProps) => {
 							<Box sx={{ display: 'flex', alignItems: 'center' }}>
 								<Image
 									src='/logo.svg'
-									alt='Министерство Высшего Образования'
+									alt='Ministry of Higher Education'
 									width={30}
 									height={30}
 								/>
@@ -198,7 +188,7 @@ const Header = ({ transparent = false }: HeaderProps) => {
 										textDecoration: 'none',
 									}}
 								>
-									ДИ кафедра
+									SE Department
 								</Typography>
 							</Box>
 						</Link>
@@ -217,55 +207,37 @@ const Header = ({ transparent = false }: HeaderProps) => {
 							href={`/${language}`}
 							sx={{ my: 2, color: 'white', display: 'block' }}
 						>
-							Главная
+							Home
 						</Button>
 						<Button
 							component={Link}
 							href={`/${language}/news`}
 							sx={{ my: 2, color: 'white', display: 'block' }}
 						>
-							Новости
+							News
 						</Button>
 						<Button
 							component={Link}
 							href={`/${language}/about`}
 							sx={{ my: 2, color: 'white', display: 'block' }}
 						>
-							О нас
+							About us
 						</Button>
 					</Box>
 
-					{/* Language selector and login button */}
+					{/* Profile / Login */}
 					<Box sx={{ display: 'flex', alignItems: 'center' }}>
-						{/* <FormControl variant='standard' sx={{ m: 1, minWidth: 80 }}>
-							<Select
-								value={language}
-								onChange={handleLanguageChange}
-								sx={{
-									color: 'white',
-									'& .MuiSelect-icon': { color: 'white' },
-									'&:before': { borderColor: 'white' },
-									'&:after': { borderColor: 'white' },
-								}}
-								IconComponent={Language}
-							>
-								<MenuItem value='uz'>UZ</MenuItem>
-								<MenuItem value='ru'>RU</MenuItem>
-								<MenuItem value='en'>EN</MenuItem>
-							</Select>
-						</FormControl> */}
-
 						{isAuthenticated ? (
 							<Button
 								color='inherit'
 								onClick={handleProfile}
 								startIcon={<Person />}
 							>
-								{userRole === 'admin' ? 'Админ' : 'Профиль'}
+								{userRole === 'admin' ? 'Admin' : 'Profile'}
 							</Button>
 						) : (
 							<Button color='inherit' onClick={handleLogin}>
-								Войти
+								Login
 							</Button>
 						)}
 					</Box>

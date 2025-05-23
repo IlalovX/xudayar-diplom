@@ -53,10 +53,18 @@ type DocFormData = {
 	visible: boolean
 }
 type DocumentWithId = DocFormData & { id: string }
+
 export default function DocsPage() {
-	const { data: docs = [], refetch } = fetchDocuments<DocumentWithId[]>()
+	const [searchTerm, setSearchTerm] = useState('')
+	const [filterCategory, setFilterCategory] = useState('')
+
 	const { data: categories = [] } = useGetCategories()
 	const { data: years = [] } = useGetYears()
+
+	const { data: docs, refetch } = fetchDocuments({
+		document_name: searchTerm,
+		category_id: filterCategory,
+	})
 
 	const createDocument = useCreateDocument()
 	const updateDocument = useUpdateDocument()
@@ -79,10 +87,10 @@ export default function DocsPage() {
 		setFile(null)
 
 		if (doc) {
-			setValue('document_name', doc.title)
-			setValue('document_description', doc.description)
-			setValue('category_id', doc.categoryId)
-			setValue('document_year', doc.yearId)
+			setValue('document_name', doc.document_name)
+			setValue('document_description', doc.document_description)
+			setValue('category_id', doc.category_id)
+			setValue('document_year', doc.document_year)
 		} else {
 			reset()
 		}
@@ -103,15 +111,10 @@ export default function DocsPage() {
 		formData.append('document_description', data.document_description)
 		formData.append('category_id', data.category_id)
 		formData.append('document_year', data.document_year)
-		formData.append('visible', Boolean(true))
+		formData.append('visible', String(true))
 
 		if (file) {
-			formData.append('document', file) // Это должно совпадать с ключом на сервере
-		}
-
-		// Печатаем formData перед отправкой
-		for (let pair of formData.entries()) {
-			console.log(pair[0] + ': ' + pair[1])
+			formData.append('document', file)
 		}
 
 		try {
@@ -123,7 +126,7 @@ export default function DocsPage() {
 			refetch()
 			handleCloseDialog()
 		} catch (error) {
-			console.error('Ошибка при сохранении документа', error)
+			console.error('Error saving document', error)
 		}
 	}
 
@@ -132,7 +135,7 @@ export default function DocsPage() {
 			await DocumentsService.delete(id)
 			refetch()
 		} catch (error) {
-			console.error('Ошибка при удалении документа', error)
+			console.error('Error deleting document', error)
 		}
 	}
 
@@ -140,6 +143,16 @@ export default function DocsPage() {
 		onDrop: acceptedFiles => setFile(acceptedFiles[0]),
 		multiple: false,
 	})
+
+	const handleCategoryChange = (
+		event: React.ChangeEvent<{ value: unknown }>
+	) => {
+		setFilterCategory(event.target.value as string)
+	}
+
+	const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setSearchTerm(event.target.value)
+	}
 
 	return (
 		<Container maxWidth='lg' sx={{ py: 4 }}>
@@ -149,45 +162,71 @@ export default function DocsPage() {
 				alignItems='center'
 				mb={3}
 			>
-				<Typography variant='h4'>Документы</Typography>
+				<Typography variant='h4'>Documents</Typography>
 				<Button
 					variant='contained'
 					startIcon={<Add />}
 					onClick={() => handleOpenDialog()}
 				>
-					Добавить
+					Add
 				</Button>
 			</Box>
+
+			<Box display='flex' gap={2} mb={3} alignItems='center'>
+				<TextField
+					label='Search by name'
+					variant='outlined'
+					value={searchTerm}
+					onChange={handleSearchChange}
+					fullWidth
+				/>
+				<TextField
+					select
+					label='Category'
+					value={filterCategory}
+					onChange={handleCategoryChange}
+					sx={{ width: 200 }}
+				>
+					<MenuItem value=''>All categories</MenuItem>
+					{categories.map(cat => (
+						<MenuItem key={cat.id} value={cat.id}>
+							{cat.category_name}
+						</MenuItem>
+					))}
+				</TextField>
+			</Box>
+
 			<Breadcrumbs separator={<NavigateNext fontSize='small' />} sx={{ mb: 1 }}>
 				<Link href='/' style={{ textDecoration: 'none', color: 'inherit' }}>
-					Главная
+					Home
 				</Link>
 				<Link
 					href='/profile'
 					style={{ textDecoration: 'none', color: 'inherit' }}
 				>
-					Профиль
+					Profile
 				</Link>
-				<Typography color='text.primary'>Мои документы</Typography>
+				<Typography color='text.primary'>My Documents</Typography>
 			</Breadcrumbs>
+
 			<Paper>
 				<TableContainer>
 					<Table>
 						<TableHead>
 							<TableRow>
-								<TableCell>Название</TableCell>
-								<TableCell>Описание</TableCell>
-								<TableCell>Категория</TableCell>
-								<TableCell>Год</TableCell>
-								<TableCell>Действия</TableCell>
+								<TableCell>Name</TableCell>
+								<TableCell>Description</TableCell>
+								<TableCell>Category</TableCell>
+								<TableCell>Year</TableCell>
+								<TableCell>Actions</TableCell>
 							</TableRow>
 						</TableHead>
 						<TableBody>
-							{docs.length ? (
+							{docs && docs.length ? (
 								docs.map(doc => (
 									<TableRow key={doc.id}>
 										<TableCell>{doc.document_name}</TableCell>
-										<TableCell>{doc.document_description}</TableCell>
+										<TableCell>{doc.document_description || '-'}</TableCell>
 										<TableCell>
 											{categories.find(cat => cat.id === doc.category_id)
 												?.category_name || '—'}
@@ -196,7 +235,6 @@ export default function DocsPage() {
 											{years.find(year => year.id === doc.document_year)
 												?.year || '—'}
 										</TableCell>
-
 										<TableCell>
 											<IconButton
 												onClick={() => window.open(doc.document, '_blank')}
@@ -215,7 +253,7 @@ export default function DocsPage() {
 							) : (
 								<TableRow>
 									<TableCell colSpan={5} align='center'>
-										Документы не найдены
+										No documents found
 									</TableCell>
 								</TableRow>
 							)}
@@ -230,23 +268,21 @@ export default function DocsPage() {
 				fullWidth
 				maxWidth='sm'
 			>
-				<DialogTitle>
-					{selectedDoc ? 'Редактировать' : 'Добавить'} документ
-				</DialogTitle>
+				<DialogTitle>{selectedDoc ? 'Edit' : 'Add'} Document</DialogTitle>
 				<DialogContent dividers>
 					<form>
 						<Controller
 							name='document_name'
 							control={control}
-							rules={{ required: 'Название обязательно' }}
+							rules={{ required: 'Name is required' }}
 							render={({ field }) => (
 								<TextField
 									{...field}
-									label='Название'
+									label='Name'
 									fullWidth
 									margin='normal'
-									error={!!errors.title}
-									helperText={errors.title?.message}
+									error={!!errors.document_name}
+									helperText={errors.document_name?.message}
 								/>
 							)}
 						/>
@@ -256,7 +292,7 @@ export default function DocsPage() {
 							render={({ field }) => (
 								<TextField
 									{...field}
-									label='Описание'
+									label='Description'
 									fullWidth
 									margin='normal'
 									multiline
@@ -267,11 +303,11 @@ export default function DocsPage() {
 						<Controller
 							name='category_id'
 							control={control}
-							rules={{ required: 'Категория обязательна' }}
+							rules={{ required: 'Category is required' }}
 							render={({ field }) => (
 								<TextField
 									{...field}
-									label='Категория'
+									label='Category'
 									select
 									fullWidth
 									margin='normal'
@@ -289,16 +325,16 @@ export default function DocsPage() {
 						<Controller
 							name='document_year'
 							control={control}
-							rules={{ required: 'Год обязателен' }}
+							rules={{ required: 'Year is required' }}
 							render={({ field }) => (
 								<TextField
 									{...field}
-									label='Год'
+									label='Year'
 									select
 									fullWidth
 									margin='normal'
-									error={!!errors.yearId}
-									helperText={errors.yearId?.message}
+									error={!!errors.document_year}
+									helperText={errors.document_year?.message}
 								>
 									{years.map(year => (
 										<MenuItem key={year.id} value={year.id}>
@@ -308,7 +344,6 @@ export default function DocsPage() {
 								</TextField>
 							)}
 						/>
-						{/* File upload validation */}
 						<Box
 							{...getRootProps()}
 							sx={{
@@ -322,28 +357,22 @@ export default function DocsPage() {
 						>
 							<input {...getInputProps()} />
 							<Typography>
-								{file
-									? file.name
-									: 'Перетащите файл сюда или кликните для выбора'}
+								{file ? file.name : 'Drag a file here or click to select'}
 							</Typography>
-							{!file && (
-								<Typography color='error'>
-									Файл обязателен для загрузки
-								</Typography>
-							)}
+							{!file && <Typography color='error'>File is required</Typography>}
 						</Box>
 					</form>
 				</DialogContent>
 				<DialogActions>
 					<Button onClick={handleCloseDialog} disabled={isSubmitting}>
-						Отмена
+						Cancel
 					</Button>
 					<Button
 						onClick={handleSubmit(onSubmit)}
 						variant='contained'
 						disabled={isSubmitting}
 					>
-						{isSubmitting ? 'Сохранение...' : 'Сохранить'}
+						{isSubmitting ? 'Saving...' : 'Save'}
 					</Button>
 				</DialogActions>
 			</Dialog>

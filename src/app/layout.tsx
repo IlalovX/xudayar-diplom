@@ -4,9 +4,9 @@ import '../styles/globals.scss'
 import { Providers } from './providers'
 
 export const metadata: Metadata = {
-	title: 'Министерство Высшего Образования - Республика Узбекистан',
+	title: 'Document Management System – Graduation Project',
 	description:
-		'Официальный сайт Министерства Высшего Образования Республики Узбекистан',
+		'This web application was developed as part of a graduation project to automate the document workflow of the Department of Software Engineering and Mathematical Modeling at the Tashkent University of Information Technologies, Nukus Branch, Republic of Uzbekistan. Author: [Your Full Name].',
 }
 
 export default function RootLayout({

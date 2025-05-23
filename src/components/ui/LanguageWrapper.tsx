@@ -27,7 +27,7 @@ const LanguageWrapper = ({ children, params }: LanguageWrapperProps) => {
 	useEffect(() => {
 		const validLanguages = ['uz', 'ru', 'en']
 		if (!validLanguages.includes(lang)) {
-			router.push('/uz')
+			router.push('/en')
 		}
 	}, [lang, router])
 

@@ -66,7 +66,7 @@ export default function AdminHeader() {
 					component='div'
 					sx={{ flexGrow: 1, color: 'primary.main', fontWeight: 600 }}
 				>
-					Панель администратора
+					Admin Panel
 				</Typography>
 
 				<Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -78,7 +78,7 @@ export default function AdminHeader() {
 
 					<Box sx={{ display: 'flex', alignItems: 'center' }}>
 						<Typography variant='body2' sx={{ mr: 1 }}>
-							{user?.fullName || 'Администратор'}
+							{user?.fullName || 'Administrator'}
 						</Typography>
 						<IconButton
 							size='large'
@@ -90,7 +90,7 @@ export default function AdminHeader() {
 						>
 							<Avatar
 								src={user?.avatar || undefined}
-								alt={user?.fullName || 'Администратор'}
+								alt={user?.fullName || 'Administrator'}
 								sx={{ width: 32, height: 32 }}
 							/>
 						</IconButton>
@@ -109,8 +109,8 @@ export default function AdminHeader() {
 							open={Boolean(anchorEl)}
 							onClose={handleClose}
 						>
-							<MenuItem onClick={handleProfile}>Профиль</MenuItem>
-							<MenuItem onClick={handleLogout}>Выйти</MenuItem>
+							<MenuItem onClick={handleProfile}>Profile</MenuItem>
+							<MenuItem onClick={handleLogout}>Logout</MenuItem>
 						</Menu>
 					</Box>
 				</Box>

@@ -63,25 +63,25 @@ export default function HomePage({ params: paramsPromise }: HomePageProps) {
 	const services = [
 		{
 			id: 1,
-			title: 'Образование',
+			title: 'Education',
 			icon: <School sx={{ color: 'white' }} />,
 			link: `/${lang}/education`,
 		},
 		{
 			id: 2,
-			title: 'Наука',
+			title: 'Science',
 			icon: <Science sx={{ color: 'white' }} />,
 			link: `/${lang}/science`,
 		},
 		{
 			id: 3,
-			title: 'Инновации',
+			title: 'Innovation',
 			icon: <Lightbulb sx={{ color: 'white' }} />,
 			link: `/${lang}/innovation`,
 		},
 		{
 			id: 6,
-			title: 'Контакты',
+			title: 'Contacts',
 			icon: <Contacts sx={{ color: 'white' }} />,
 			link: `/${lang}/contacts`,
 		},
@@ -90,13 +90,13 @@ export default function HomePage({ params: paramsPromise }: HomePageProps) {
 	const quickLinks = [
 		{
 			id: 1,
-			title: 'Поступление в ВУЗы',
+			title: 'University Admission',
 			icon: <HowToReg sx={{ color: 'black', width: '40px', height: '40px' }} />,
 			link: `/${lang}/admission`,
 		},
 		{
 			id: 2,
-			title: 'Стипендии и гранты',
+			title: 'Scholarships and Grants',
 			icon: (
 				<EmojiEvents sx={{ color: 'black', width: '40px', height: '40px' }} />
 			),
@@ -104,7 +104,7 @@ export default function HomePage({ params: paramsPromise }: HomePageProps) {
 		},
 		{
 			id: 3,
-			title: 'Научные проекты',
+			title: 'Research Projects',
 			icon: (
 				<Psychology sx={{ color: 'black', width: '40px', height: '40px' }} />
 			),
@@ -112,34 +112,29 @@ export default function HomePage({ params: paramsPromise }: HomePageProps) {
 		},
 		{
 			id: 4,
-			title: 'Рейтинг ВУЗов',
+			title: 'University Rankings',
 			icon: <BarChart sx={{ color: 'black', width: '40px', height: '40px' }} />,
 			link: `/${lang}/rankings`,
 		},
 		{
 			id: 5,
-			title: 'Электронная библиотека',
+			title: 'E-Library',
 			icon: <MenuBook sx={{ color: 'black', width: '40px', height: '40px' }} />,
 			link: `/${lang}/library`,
 		},
 		{
 			id: 6,
-			title: 'Вакансии',
+			title: 'Job Vacancies',
 			icon: <Work sx={{ color: 'black', width: '40px', height: '40px' }} />,
 			link: `/${lang}/jobs`,
 		},
 	]
 
 	const getImageUrl = (news: any) => {
-		// Проверяем, если изображения есть
 		if (news.images && Object.keys(news.images).length > 0) {
-			// Получаем первое изображение из объекта
 			const firstImageKey = Object.keys(news.images)[0]
-			console.log(news.images[firstImageKey])
-
-			return news.images[firstImageKey] || '/placeholder.svg' // Возвращаем URL изображения или заглушку
+			return news.images[firstImageKey] || '/placeholder.svg'
 		}
-
 		return '/placeholder.svg'
 	}
 
@@ -157,10 +152,10 @@ export default function HomePage({ params: paramsPromise }: HomePageProps) {
 				}}
 			>
 				<Image
-					src='/center.jfif'
-					alt='ДИ кафедры'
+					src='/nbtuit.jpg'
+					alt='Department Center'
 					fill
-					style={{ objectFit: 'cover' }}
+					style={{ objectFit: 'fill' }}
 					priority
 				/>
 				<Box
@@ -185,7 +180,7 @@ export default function HomePage({ params: paramsPromise }: HomePageProps) {
 						component='h1'
 						sx={{ fontWeight: 700, mb: 2 }}
 					>
-						ДИ кафедры
+						Department Center
 					</Typography>
 					<Button
 						variant='contained'
@@ -194,11 +189,10 @@ export default function HomePage({ params: paramsPromise }: HomePageProps) {
 						component={Link}
 						href={`/${lang}/about`}
 					>
-						Подробнее
+						Read More
 					</Button>
 				</Box>
 			</Box>
-
 			{/* Services Section */}
 			<Box sx={{ py: 6, backgroundColor: '#f5f5f5' }}>
 				<Container>
@@ -267,10 +261,10 @@ export default function HomePage({ params: paramsPromise }: HomePageProps) {
 							component='h2'
 							sx={{ fontWeight: 700, color: 'primary.main' }}
 						>
-							Новости и события
+							News and Events
 						</Typography>
 						<Button variant='outlined' component={Link} href={`/${lang}/news`}>
-							Все новости
+							All News
 						</Button>
 					</Box>
 
@@ -286,12 +280,12 @@ export default function HomePage({ params: paramsPromise }: HomePageProps) {
 								sx={{ mt: 2 }}
 								onClick={() => window.location.reload()}
 							>
-								Попробовать снова
+								Try Again
 							</Button>
 						</Box>
 					) : newsItems.length === 0 ? (
 						<Box sx={{ textAlign: 'center', py: 4 }}>
-							<Typography>Новости не найдены</Typography>
+							<Typography>No news found</Typography>
 						</Box>
 					) : (
 						<Grid container spacing={3}>
@@ -320,63 +314,74 @@ export default function HomePage({ params: paramsPromise }: HomePageProps) {
 										>
 											{newsItems[0].content ||
 												newsItems[0].description ||
-												newsItems[0].short_description}
+												newsItems[0].title}
 										</Typography>
 										<Button
+											size='small'
 											variant='contained'
 											component={Link}
 											href={`/${lang}/news/${getNewsSlug(newsItems[0])}`}
 										>
-											Читать далее
+											Read More
 										</Button>
 									</CardContent>
 								</Card>
 							</Grid>
-							<Grid size={12}>
-								<Grid container spacing={2}>
-									{newsItems.slice(1, 5).map(news => (
-										<Grid size={12} key={news.id}>
-											<Card sx={{ display: 'flex' }}>
-												<CardMedia
-													component='img'
-													sx={{ width: 160 }}
-													image={getImageUrl(news)}
-													alt={news.title}
-												/>
-												<CardContent>
-													<Typography variant='subtitle1' gutterBottom>
-														{news.title}
-													</Typography>
-													<Button
-														variant='text'
-														component={Link}
-														href={`/${lang}/news/${getNewsSlug(news)}`}
-														sx={{ mt: 1 }}
-													>
-														Подробнее
-													</Button>
-												</CardContent>
-											</Card>
-										</Grid>
-									))}
+
+							{newsItems.slice(1, 4).map(news => (
+								<Grid key={news.id} size={4}>
+									<Card
+										sx={{
+											height: '100%',
+											display: 'flex',
+											flexDirection: 'column',
+										}}
+									>
+										<CardMedia
+											component='img'
+											height='140'
+											image={getImageUrl(news)}
+											alt={news.title}
+										/>
+										<CardContent sx={{ flexGrow: 1 }}>
+											<Typography gutterBottom variant='h6'>
+												{news.title}
+											</Typography>
+											<Typography
+												variant='body2'
+												color='text.secondary'
+												sx={{ mb: 1 }}
+											>
+												{news.content || news.description || news.title}
+											</Typography>
+											<Button
+												size='small'
+												variant='outlined'
+												component={Link}
+												href={`/${lang}/news/${getNewsSlug(news)}`}
+											>
+												Read More
+											</Button>
+										</CardContent>
+									</Card>
 								</Grid>
-							</Grid>
+							))}
 						</Grid>
 					)}
 				</Container>
 			</Box>
 
 			{/* Quick Links Section */}
-			<Box sx={{ py: 6, backgroundColor: '#f0f0f0' }}>
+			<Box sx={{ py: 6, backgroundColor: '#f5f5f5' }}>
 				<Container>
 					<Typography
 						variant='h4'
 						component='h2'
-						sx={{ fontWeight: 700, mb: 4, color: 'primary.main' }}
+						sx={{ fontWeight: 700, color: 'primary.main', mb: 3 }}
 					>
-						Быстрые ссылки
+						Quick Links
 					</Typography>
-					<Grid container spacing={2}>
+					<Grid container spacing={2} justifyContent='center'>
 						{quickLinks.map(link => (
 							<Grid size={2} key={link.id}>
 								<Link
@@ -386,23 +391,37 @@ export default function HomePage({ params: paramsPromise }: HomePageProps) {
 								>
 									<Box
 										sx={{
+											minHeight: 150,
 											display: 'flex',
 											flexDirection: 'column',
 											alignItems: 'center',
 											p: 2,
+											transition: 'transform 0.3s',
+											'&:hover': {
+												transform: 'translateY(-5px)',
+											},
 											backgroundColor: 'white',
-											height: '100%',
 											borderRadius: 2,
 											boxShadow: 1,
-											transition: '0.3s',
-											'&:hover': {
-												boxShadow: 4,
-												transform: 'translateY(-3px)',
-											},
 										}}
 									>
-										{link.icon}
-										<Typography variant='body2' align='center' sx={{ mt: 1 }}>
+										<Box
+											sx={{
+												width: 60,
+												height: 60,
+												display: 'flex',
+												justifyContent: 'center',
+												alignItems: 'center',
+												mb: 1,
+											}}
+										>
+											{link.icon}
+										</Box>
+										<Typography
+											variant='subtitle2'
+											align='center'
+											sx={{ color: 'text.primary' }}
+										>
 											{link.title}
 										</Typography>
 									</Box>
